@@ -1,9 +1,11 @@
 package cn.zhuo.engine.core.context;
 
+import cn.zhuo.engine.exception.EngineException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.util.Assert;
+
+import java.util.Optional;
 
 /**
  * 任务上下文
@@ -25,7 +27,7 @@ public class TaskJsonNodeContext implements ITaskContext<JsonNode> {
 
     @Override
     public void put(String key, Object value) {
-        Assert.notNull(objectNode, "TaskJsonNodeContext 未初始化");
+        Optional.ofNullable(objectNode).orElseThrow(() -> new EngineException("TaskJsonNodeContext 非法，请通过 getInstance 获取"));
         this.objectNode.set(key, (JsonNode) value);
     }
 
