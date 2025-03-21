@@ -16,6 +16,7 @@
         <module>piper-ai-trigger</module>
         <module>piper-ai-types</module>
         <module>piper-ai-engine</module>
+        <module>piper-ai-engine/piper-ai-engine-worker</module>
     </modules>
 
     <properties>

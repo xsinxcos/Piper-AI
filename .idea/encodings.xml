@@ -7,7 +7,10 @@
     <file url="file://$PROJECT_DIR$/piper-ai-app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-domain/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-domain/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/piper-ai-engine/piper-ai-engine-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/piper-ai-engine/piper-ai-engine-worker/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-engine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/piper-ai-engine/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-infrastructure/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-infrastructure/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/piper-ai-trigger/src/main/java" charset="UTF-8" />

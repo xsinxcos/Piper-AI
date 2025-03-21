@@ -1,4 +1,4 @@
-package cn.zhuo.engine.exception;
+package com.zhuo.piper.exception;
 
 public class EngineException extends RuntimeException {
     public EngineException(String message) {

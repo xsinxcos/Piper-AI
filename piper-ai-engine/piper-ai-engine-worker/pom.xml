@@ -7,21 +7,22 @@
         <groupId>com.zhuo.piper</groupId>
         <artifactId>Piper-AI</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>piper-ai-engine</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>piper-ai-engine-common</module>
-    </modules>
+    <artifactId>piper-ai-engine-worker</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
-    <dependencies>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.zhuo.piper</groupId>
+            <artifactId>piper-ai-engine-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

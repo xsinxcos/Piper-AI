@@ -1,0 +1,30 @@
+package com.zhuo.piper.scheduler;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.zhuo.piper.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class TopicMessage {
+    private String topicName;
+
+    private String trace;
+
+    private String msg;
+
+    public static <T> TopicMessage getInstance(Topic topic , String trace , T msg){
+        TopicMessage topicMessage = new TopicMessage();
+        topicMessage.topicName = topic.getTopic();
+        topicMessage.trace = trace;
+        topicMessage.msg = JsonUtils.toJson(msg);
+        return topicMessage;
+    }
+
+    public JsonNode getMsgByJsonNode(){
+        return JsonUtils.toJsonNode(this.msg);
+    }
+}
