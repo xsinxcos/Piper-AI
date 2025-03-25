@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: piper-ai-worker
+
+# ZooKeeper configuration
+zookeeper:
+  connect-string: localhost:2181
+  session-timeout-ms: 60000
+  connection-timeout-ms: 15000
+  base-path: /piper-ai
+
+# Worker configuration
+worker:
+  max-tasks: 10
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    com.zhuo.piper: DEBUG
+    org.apache.zookeeper: WARN
+    org.apache.curator: WARN 
