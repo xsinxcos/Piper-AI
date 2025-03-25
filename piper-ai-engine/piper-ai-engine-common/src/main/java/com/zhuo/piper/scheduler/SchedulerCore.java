@@ -1,8 +1,8 @@
 package com.zhuo.piper.scheduler;
 
 
-import com.zhuo.piper.core.context.ITaskContext;
-import com.zhuo.piper.drive.EventDriveConfiguration;
+import com.zhuo.piper.context.ITaskContext;
+import com.zhuo.piper.drive.EventDrive;
 import com.zhuo.piper.scheduler.chain.SchedulerAfterChain;
 import com.zhuo.piper.scheduler.chain.SchedulerBeforeChain;
 import jakarta.annotation.Resource;
@@ -18,7 +18,7 @@ public class SchedulerCore implements Scheduler{
     private SchedulerAfterChain afterChain;
 
     @Resource
-    private EventDriveConfiguration eventDrive;
+    private EventDrive eventDrive;
 
 
     @Override

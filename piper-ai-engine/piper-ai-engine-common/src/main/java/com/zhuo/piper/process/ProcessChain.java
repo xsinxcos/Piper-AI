@@ -1,6 +1,6 @@
 package com.zhuo.piper.process;
 
-import com.zhuo.piper.core.context.ITaskContext;
+import com.zhuo.piper.context.ITaskContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

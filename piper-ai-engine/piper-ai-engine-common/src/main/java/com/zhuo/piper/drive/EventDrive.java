@@ -1,6 +1,6 @@
 package com.zhuo.piper.drive;
 
-public interface EventDriveConfiguration {
+public interface EventDrive {
 
     void schedule(TopicMessage topicMessage);
 

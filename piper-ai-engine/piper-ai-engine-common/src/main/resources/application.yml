@@ -1,6 +1,13 @@
+server:
+  port: 8071
 spring:
   application:
     name: piper-ai-worker
+  datasource:
+    url: jdbc:mysql://localhost:3306/piper_ai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 # ZooKeeper configuration
 zookeeper:
@@ -8,6 +15,10 @@ zookeeper:
   session-timeout-ms: 60000
   connection-timeout-ms: 15000
   base-path: /piper-ai
+  node:
+    ip: 127.0.0.1
+    port: 7070
+    service-name: /piper-ai
 
 # Worker configuration
 worker:
@@ -19,4 +30,4 @@ logging:
     root: INFO
     com.zhuo.piper: DEBUG
     org.apache.zookeeper: WARN
-    org.apache.curator: WARN 
+    org.apache.curator: WARN

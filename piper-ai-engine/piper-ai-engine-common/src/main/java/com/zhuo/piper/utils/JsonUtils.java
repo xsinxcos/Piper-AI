@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.text.SimpleDateFormat;
 import java.util.Optional;
@@ -19,8 +18,6 @@ public class JsonUtils {
     // 基础配置的ObjectMapper
     private static ObjectMapper buildObjectMapper() {
         return new ObjectMapper()
-                // 注册Java 8时间模块
-                .registerModule(new JavaTimeModule())
                 // 禁用自动关闭流
                 .disable(SerializationFeature.CLOSE_CLOSEABLE)
                 // 禁用未知属性异常

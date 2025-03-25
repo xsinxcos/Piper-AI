@@ -6,10 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopicMessage {
+public class TopicMessage implements Serializable {
     private String topicName;
 
     private String trace;

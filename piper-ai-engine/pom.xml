@@ -22,6 +22,10 @@
     </properties>
     
     <dependencies>
-
+        <dependency>
+            <groupId>com.zhuo.piper</groupId>
+            <artifactId>piper-ai-infrastructure</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

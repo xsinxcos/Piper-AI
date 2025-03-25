@@ -1,6 +1,6 @@
 package com.zhuo.piper.scheduler;
 
-import com.zhuo.piper.core.context.ITaskContext;
+import com.zhuo.piper.context.ITaskContext;
 
 public interface Scheduler {
 
