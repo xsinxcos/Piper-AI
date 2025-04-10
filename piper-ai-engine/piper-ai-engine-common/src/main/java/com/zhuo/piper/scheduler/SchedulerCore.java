@@ -24,7 +24,7 @@ public class SchedulerCore implements Scheduler{
     @Override
     public void run(ITaskContext<?> aTask) {
         beforeChain.run(aTask);
-
+        String taskId = (String) aTask.get("dagId");
 
         afterChain.run(aTask);
     }

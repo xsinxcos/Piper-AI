@@ -1,27 +1,28 @@
 package com.zhuo.piper.scheduler;
 
-import com.zhuo.piper.process.Process;
+import com.zhuo.piper.Node;
 import com.zhuo.piper.process.ProcessType;
 import com.zhuo.piper.task.Handler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * 有向无环图 (Directed Acyclic Graph)
  */
+@Slf4j
+@Component
 public class DAG {
     // 所有节点Map，Key为节点ID，Value为节点处理器
-    private final Map<String, Handler<?>> nodes = new HashMap<>();
+    private final Map<String, Node> nodes = new HashMap<>();
     
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
     private final Map<String, List<String>> edges = new HashMap<>();
     
-    // 节点类型映射，Key为节点ID，Value为节点类型
-    private final Map<String, ProcessType> nodeTypes = new HashMap<>();
-    
     // 入度表，用于拓扑排序
     private final Map<String, Integer> inDegrees = new HashMap<>();
-    
+
     /**
      * 添加节点
      * 
@@ -32,7 +33,6 @@ public class DAG {
      */
     public DAG addNode(String nodeId, Handler<?> handler, ProcessType type) {
         nodes.put(nodeId, handler);
-        nodeTypes.put(nodeId, type);
         inDegrees.putIfAbsent(nodeId, 0);
         return this;
     }
@@ -41,12 +41,10 @@ public class DAG {
      * 添加节点
      * 
      * @param nodeId 节点ID
-     * @param process 流程处理器
      * @return 当前DAG实例
      */
-    public DAG addNode(String nodeId, Process<?> process) {
-        nodes.put(nodeId, task -> process.run(task));
-        nodeTypes.put(nodeId, process.type());
+    public DAG addNode(String nodeId, Node node) {
+        nodes.put(nodeId, node);
         inDegrees.putIfAbsent(nodeId, 0);
         return this;
     }
@@ -165,8 +163,8 @@ public class DAG {
      * @param nodeId 当前节点ID
      * @return 下一个Handler的Map（key为节点ID，value为Handler）
      */
-    public Map<String, Handler<?>> getNextHandler(String nodeId) {
-        Map<String, Handler<?>> nextHandlers = new HashMap<>();
+    public Map<String, Node> getNextHandler(String nodeId) {
+        Map<String, Node> nextHandlers = new HashMap<>();
         
         // 获取当前节点的所有后续节点
         List<String> nextNodeIds = edges.getOrDefault(nodeId, Collections.emptyList());
@@ -182,7 +180,7 @@ public class DAG {
      * 
      * @return 节点Map
      */
-    public Map<String, Handler<?>> getNodes() {
+    public Map<String, Node> getNodes() {
         return Collections.unmodifiableMap(nodes);
     }
     
@@ -194,16 +192,8 @@ public class DAG {
     public Map<String, List<String>> getEdges() {
         return Collections.unmodifiableMap(edges);
     }
-    
-    /**
-     * 获取节点类型
-     * 
-     * @return 节点类型Map
-     */
-    public Map<String, ProcessType> getNodeTypes() {
-        return Collections.unmodifiableMap(nodeTypes);
-    }
-    
+
+
     /**
      * 获取图的节点数量
      * 
@@ -219,7 +209,8 @@ public class DAG {
     public void clear() {
         nodes.clear();
         edges.clear();
-        nodeTypes.clear();
         inDegrees.clear();
     }
+
+
 }
