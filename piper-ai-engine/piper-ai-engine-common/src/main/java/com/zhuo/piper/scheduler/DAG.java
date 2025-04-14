@@ -1,12 +1,16 @@
 package com.zhuo.piper.scheduler;
 
-import com.zhuo.piper.Node;
+import com.zhuo.piper.context.task.execution.TaskExecution;
+import com.zhuo.piper.context.Node;
 import com.zhuo.piper.process.ProcessType;
 import com.zhuo.piper.task.Handler;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 有向无环图 (Directed Acyclic Graph)
@@ -15,14 +19,23 @@ import java.util.*;
 @Component
 public class DAG {
     // 所有节点Map，Key为节点ID，Value为节点处理器
-    private final Map<String, Node> nodes = new HashMap<>();
+    private final Map<String, Node> nodes = new ConcurrentHashMap<>();
     
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
-    private final Map<String, List<String>> edges = new HashMap<>();
+    private final Map<String, List<String>> edges = new ConcurrentHashMap<>();
     
     // 入度表，用于拓扑排序
-    private final Map<String, Integer> inDegrees = new HashMap<>();
+    private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
+    private final Map<String ,NodeConfig> configMap = new ConcurrentHashMap<>();
+
+    @Getter
+    @AllArgsConstructor
+    static
+    class NodeConfig {
+        private String nodeId;
+        private TaskExecution context;
+    }
     /**
      * 添加节点
      * 
@@ -202,7 +215,20 @@ public class DAG {
     public int size() {
         return nodes.size();
     }
-    
+
+    /**
+     * 获取 入度为 0 的节点
+     */
+    public List<String> getZeroInDegreeNodes(){
+        List<String> zeroInInDegreeNodes = new ArrayList<>();
+        inDegrees.forEach((k ,v) -> {
+            if(v == 0){
+                zeroInInDegreeNodes.add(k);
+            }
+        });
+        return zeroInInDegreeNodes;
+    }
+
     /**
      * 清空图
      */
@@ -212,5 +238,138 @@ public class DAG {
         inDegrees.clear();
     }
 
+    /**
+     * 安全移除节点
+     * 只有当节点的入度为0时才允许移除
+     * 
+     * @param nodeId 要移除的节点ID
+     * @return 当前DAG实例
+     * @throws IllegalStateException 如果节点的入度不为0
+     */
+    public DAG safeRemoveNode(String nodeId) {
+        // 检查节点是否存在
+        if (!nodes.containsKey(nodeId)) {
+            throw new IllegalArgumentException("节点不存在：" + nodeId);
+        }
+        
+        // 检查入度
+        int inDegree = inDegrees.getOrDefault(nodeId, 0);
+        if (inDegree > 0) {
+            throw new IllegalStateException("无法移除节点 " + nodeId + "，因为其入度为 " + inDegree);
+        }
+        
+        // 移除节点
+        nodes.remove(nodeId);
+        inDegrees.remove(nodeId);
+        
+        // 移除所有以该节点为起点的边
+        List<String> outgoingEdges = edges.remove(nodeId);
+        if (outgoingEdges != null) {
+            // 减少所有目标节点的入度
+            for (String targetNodeId : outgoingEdges) {
+                inDegrees.put(targetNodeId, inDegrees.get(targetNodeId) - 1);
+            }
+        }
+        
+        // 移除所有以该节点为终点的边
+        for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+            entry.getValue().remove(nodeId);
+        }
+        
+        return this;
+    }
+
+    /**
+     * 在指定节点后插入另一个DAG，并将子DAG的结束节点连接到目标节点原来的后续节点
+     * 
+     * @param targetNodeId 目标节点ID，新的DAG将被插入到该节点之后
+     * @param otherDAG 要插入的DAG
+     * @return 当前DAG实例
+     * @throws IllegalArgumentException 如果目标节点不存在
+     * @throws IllegalStateException 如果插入后形成环
+     */
+    public DAG insertDAGAfterNode(String targetNodeId, DAG otherDAG) {
+        // 检查目标节点是否存在
+        if (!nodes.containsKey(targetNodeId)) {
+            throw new IllegalArgumentException("目标节点不存在：" + targetNodeId);
+        }
+
+        // 保存目标节点原来的后续节点
+        List<String> originalNextNodes = edges.getOrDefault(targetNodeId, new ArrayList<>());
+        
+        // 获取要插入的DAG的所有节点和边
+        Map<String, Node> otherNodes = otherDAG.getNodes();
+        Map<String, List<String>> otherEdges = otherDAG.getEdges();
+
+        // 添加所有新节点
+        for (Map.Entry<String, Node> entry : otherNodes.entrySet()) {
+            this.addNode(entry.getKey(), entry.getValue());
+        }
+
+        // 添加所有新边
+        for (Map.Entry<String, List<String>> entry : otherEdges.entrySet()) {
+            String fromNode = entry.getKey();
+            for (String toNode : entry.getValue()) {
+                this.addEdge(fromNode, toNode);
+            }
+        }
+
+        // 获取要插入的DAG的入度为0的节点（起始节点）
+        List<String> startNodes = otherDAG.getZeroInDegreeNodes();
+
+        // 将目标节点连接到新DAG的所有起始节点
+        for (String startNode : startNodes) {
+            this.addEdge(targetNodeId, startNode);
+        }
+
+        // 找出子DAG的结束节点（出度为0的节点）
+        List<String> endNodes = new ArrayList<>();
+        for (String nodeId : otherNodes.keySet()) {
+            if (!otherEdges.containsKey(nodeId) || otherEdges.get(nodeId).isEmpty()) {
+                endNodes.add(nodeId);
+            }
+        }
+
+        // 将子DAG的结束节点连接到目标节点原来的后续节点
+        for (String endNode : endNodes) {
+            for (String originalNextNode : originalNextNodes) {
+                this.addEdge(endNode, originalNextNode);
+            }
+        }
+
+        // 检查是否形成环
+        if (this.hasCycle()) {
+            // 回退操作：移除所有新添加的边和节点
+            for (String startNode : startNodes) {
+                edges.get(targetNodeId).remove(startNode);
+                inDegrees.put(startNode, inDegrees.get(startNode) - 1);
+            }
+            
+            for (String endNode : endNodes) {
+                for (String originalNextNode : originalNextNodes) {
+                    edges.get(endNode).remove(originalNextNode);
+                    inDegrees.put(originalNextNode, inDegrees.get(originalNextNode) - 1);
+                }
+            }
+            
+            for (Map.Entry<String, List<String>> entry : otherEdges.entrySet()) {
+                String fromNode = entry.getKey();
+                for (String toNode : entry.getValue()) {
+                    edges.get(fromNode).remove(toNode);
+                    inDegrees.put(toNode, inDegrees.get(toNode) - 1);
+                }
+            }
+            
+            for (String nodeId : otherNodes.keySet()) {
+                nodes.remove(nodeId);
+                inDegrees.remove(nodeId);
+                edges.remove(nodeId);
+            }
+            
+            throw new IllegalStateException("插入DAG后形成了环，操作已回退");
+        }
+
+        return this;
+    }
 
 }

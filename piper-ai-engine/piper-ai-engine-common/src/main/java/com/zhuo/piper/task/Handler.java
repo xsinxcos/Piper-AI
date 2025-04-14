@@ -1,8 +1,8 @@
 package com.zhuo.piper.task;
 
 
-import com.zhuo.piper.Node;
-import com.zhuo.piper.context.ITaskContext;
+import com.zhuo.piper.context.Node;
+import com.zhuo.piper.context.task.execution.TaskExecution;
 
 /**
  * 节点标识
@@ -10,5 +10,5 @@ import com.zhuo.piper.context.ITaskContext;
  * @param <O>
  */
 public interface Handler<O> extends Node {
-    O handle(ITaskContext<?> aTask) throws Exception;
+    O handle(TaskExecution aTask) throws Exception;
 }

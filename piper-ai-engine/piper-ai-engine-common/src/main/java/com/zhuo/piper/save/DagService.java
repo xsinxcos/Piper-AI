@@ -2,7 +2,7 @@ package com.zhuo.piper.save;
 
 import cn.zhuo.domain.common.util.SnowflakeIdGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.zhuo.piper.Node;
+import com.zhuo.piper.context.Node;
 import com.zhuo.piper.save.entity.DagEdge;
 import com.zhuo.piper.save.entity.DagEntity;
 import com.zhuo.piper.save.entity.DagNode;
@@ -13,11 +13,13 @@ import com.zhuo.piper.scheduler.DAG;
 import com.zhuo.piper.task.Handler;
 import com.zhuo.piper.utils.JsonUtils;
 import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class DagService{
 
     @Resource
@@ -79,17 +81,38 @@ public class DagService{
         return saveNodes;
     }
 
-    public DAG load(){
+    public DAG load(String dagId){
         // 获取最新的DAG实体
-        DagEntity dagEntity = dagEntityMapper.selectLatest();
+        DagEntity dagEntity = dagEntityMapper.selectLatest(dagId);
         if (dagEntity == null) {
             return null;
         }
+        return buildDAG(dagEntity.getId());
+    }
 
+    private Integer getType(Node node){
+        if(node instanceof Process){
+            return 1;
+        }else if(node instanceof Handler<?>){
+            return 0;
+        }
+        return -1;
+    }
+
+    public DAG loadSubDag(String subDagId){
+        // 获取最新的DAG实体
+        DagEntity dagEntity = dagEntityMapper.selectById(subDagId);
+        if (dagEntity == null) {
+            return null;
+        }
+        return buildDAG(dagEntity.getId());
+    }
+
+    private DAG buildDAG(String dagId){
         // 加载所有节点
-        List<DagNode> dagNodes = nodeMapper.selectByDagId(dagEntity.getId());
+        List<DagNode> dagNodes = nodeMapper.selectByDagId(dagId);
         // 加载所有边
-        List<DagEdge> dagEdges = dagEdgeMapper.selectByDagId(dagEntity.getId());
+        List<DagEdge> dagEdges = dagEdgeMapper.selectByDagId(dagId);
 
         // 创建新的DAG实例
         DAG dag = new DAG();
@@ -111,16 +134,6 @@ public class DagService{
         for (DagEdge dagEdge : dagEdges) {
             dag.addEdge(dagEdge.getFromNodeId(), dagEdge.getToNodeId());
         }
-
         return dag;
-    }
-
-    private Integer getType(Node node){
-        if(node instanceof Process){
-            return 1;
-        }else if(node instanceof Handler<?>){
-            return 0;
-        }
-        return -1;
     }
 }

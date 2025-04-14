@@ -4,8 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum Topic {
-    PROCESS("Process"),
-    TASK("Task");
+    START("start"),
+    RUNNING("running"),
+    FINISH("finish"),
+    ERROR("error");
 
     private final String topic;
 

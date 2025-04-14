@@ -1,12 +1,28 @@
 package com.zhuo.piper.task;
 
-public class TaskStatus {
-    public final static Integer ASSIGN = 0;
+public enum TaskStatus{
+    /**
+     * The task is in the process of being created.
+     */
+    CREATING,
 
-    public final static Integer START = 1;
+    /**
+     * The task is in the process of being executed.
+     */
+    EXECUTING,
 
-    public final static Integer RUNNING = 2;
+    /**
+     * The task has been successfully executed.
+     */
+    SUCCESS,
 
-    public final static Integer COMPLETED = 3;
+    /**
+     * The task has failed to execute.
+     */
+    FAILED,
 
+    /**
+     * The task has been cancelled.
+     */
+    CANCELLED
 }

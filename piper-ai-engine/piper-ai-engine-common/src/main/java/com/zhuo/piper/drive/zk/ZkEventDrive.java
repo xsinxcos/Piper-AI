@@ -32,7 +32,7 @@ public class ZkEventDrive implements EventDrive , DisposableBean {
     @Override
     public void schedule(TopicMessage topicMessage) {
         ServiceInstance<TopicMessage> instance = zkServiceFactory.getInstance();
-        rpcClient.trigger(new TopicMessage(instance.getAddress() + "/" + instance.getPort() ,
+        rpcClient.trigger(new TopicMessage( "http://"+instance.getAddress() + ":" + instance.getPort() ,
                 UUID.randomUUID().toString() ,
                 "test"));
     }

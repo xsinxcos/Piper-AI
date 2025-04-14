@@ -1,31 +1,44 @@
 package com.zhuo.piper.scheduler;
 
-
-import com.zhuo.piper.context.ITaskContext;
+import com.zhuo.piper.context.MapObject;
+import com.zhuo.piper.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.drive.EventDrive;
-import com.zhuo.piper.scheduler.chain.SchedulerAfterChain;
-import com.zhuo.piper.scheduler.chain.SchedulerBeforeChain;
+import com.zhuo.piper.scheduler.chain.AbstractSchedulerChain;
+import com.zhuo.piper.scheduler.chain.before.ParallelSchedule;
+import com.zhuo.piper.scheduler.chain.before.TaskExecutionInit;
+import com.zhuo.piper.scheduler.chain.process.ProcessScheduler;
+import com.zhuo.piper.scheduler.chain.task.TaskScheduler;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.Executor;
+
 @Component
-public class SchedulerCore implements Scheduler{
-
-    @Resource
-    private SchedulerBeforeChain beforeChain;
-
-    @Resource
-    private SchedulerAfterChain afterChain;
-
+public class SchedulerCore {
     @Resource
     private EventDrive eventDrive;
 
+    @Autowired
+    @Qualifier(value = "AsyncExecutor")
+    private Executor executor;
 
-    @Override
-    public void run(ITaskContext<?> aTask) {
-        beforeChain.run(aTask);
-        String taskId = (String) aTask.get("dagId");
+    private AbstractSchedulerChain schedulerChain;
 
-        afterChain.run(aTask);
+    @PostConstruct
+    void init() {
+        TaskExecutionInit init = new TaskExecutionInit();
+        init.setNext(
+                new ParallelSchedule(executor,
+                        new ProcessScheduler(),
+                        new TaskScheduler(eventDrive))
+        );
+        schedulerChain.setNext(init);
+    }
+
+    void run(){
+        schedulerChain.run(new SimpleTaskExecution(new MapObject()) ,new DAG());
     }
 }

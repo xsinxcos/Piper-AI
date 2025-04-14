@@ -1,6 +1,5 @@
 package com.zhuo.piper.drive;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.zhuo.piper.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +25,4 @@ public class TopicMessage implements Serializable {
         return topicMessage;
     }
 
-    public JsonNode getMsgByJsonNode(){
-        return JsonUtils.toJsonNode(this.msg);
-    }
 }

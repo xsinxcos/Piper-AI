@@ -17,7 +17,7 @@ zookeeper:
   base-path: /piper-ai
   node:
     ip: 127.0.0.1
-    port: 7070
+    port: 8071
     service-name: /piper-ai
 
 # Worker configuration
