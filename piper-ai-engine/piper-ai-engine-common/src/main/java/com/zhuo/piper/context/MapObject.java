@@ -1,16 +1,13 @@
 package com.zhuo.piper.context;
 
-import com.google.common.base.Throwables;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Array;
-import java.text.ParseException;
 import java.time.Duration;
 import java.util.*;
 
-public class MapObject  implements  Map<String ,Object>, Context {
+public class MapObject  implements  Map<String ,Object>, Accessor, Mutator {
     private final HashMap<String, Object> map;
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -19,6 +16,10 @@ public class MapObject  implements  Map<String ,Object>, Context {
 
     public MapObject () {
         map = new HashMap<>();
+    }
+
+    public MapObject (Map<String, Object> aSource) {
+        map = new HashMap<String, Object>(aSource);
     }
 
     public static MapObject getInstance() {
@@ -50,32 +51,6 @@ public class MapObject  implements  Map<String ,Object>, Context {
         return map.get(aKey);
     }
 
-    @Override
-    public <T> List<T> getList(Object aKey, Class<T> aElementType) {
-        List<?> list = get(aKey, List.class);
-        if(list == null) {
-            return null;
-        }
-        List<T> typedList = new ArrayList<>();
-        for(Object item : list) {
-            if(aElementType.equals(Accessor.class) || aElementType.equals(MapObject.class)) {
-                typedList.add((T)new MapObject((Map<String, Object>) item));
-            }
-            else if (aElementType.equals(PipelineTask.class)) {
-                typedList.add((T)new SimplePipelineTask((Map<String, Object>) item));
-            }
-            else {
-                typedList.add(conversionService.convert(item,aElementType));
-            }
-        }
-        return Collections.unmodifiableList(typedList);
-    }
-
-    @Override
-    public <T> List<T> getList(Object aKey, Class<T> aElementType, List<T> aDefaultValue) {
-        List<T> list = getList(aKey, aElementType);
-        return list!=null?list:aDefaultValue;
-    }
 
     @Override
     public String getString (Object aKey) {
@@ -196,18 +171,6 @@ public class MapObject  implements  Map<String ,Object>, Context {
         return get(aKey, Integer.class, aDefaultValue);
     }
 
-    @Override
-    public Date getDate(Object aKey) {
-        Object value = get(aKey);
-        if(value instanceof String) {
-            try {
-                return DateUtils.parseDate((String)value, TIMESTAMP_FORMAT);
-            } catch (ParseException e) {
-                throw Throwables.propagate(e);
-            }
-        }
-        return (Date)value;
-    }
 
     @Override
     public Boolean getBoolean(Object aKey) {
@@ -241,40 +204,8 @@ public class MapObject  implements  Map<String ,Object>, Context {
     }
 
     @Override
-    public <T> T[] getArray(Object aKey, Class<T> aElementType) {
-        Object value = get(aKey);
-        if(value.getClass().isArray() && value.getClass().getComponentType().equals(aElementType)) {
-            return (T[]) value;
-        }
-        List<T> list = getList(aKey, aElementType);
-        T[] toR = (T[]) Array.newInstance(aElementType, list.size());
-        for (int i = 0; i < list.size(); i++) {
-            toR[i] = list.get(i);
-        }
-        return toR;
-    }
-
-    @Override
-    public void set(String aKey, Object aValue) {
-        put(aKey, aValue);
-    }
-
-    @Override
-    public void setIfNull(String aKey, Object aValue) {
-        if(get(aKey)==null) {
-            set(aKey, aValue);
-        }
-    }
-
-    @Override
-    public long increment(String aKey) {
-        Long counter = getLong(aKey);
-        if(counter == null) {
-            counter = 0L;
-        }
-        counter++;
-        set(aKey, counter);
-        return counter;
+    public Date getDate(Object aKey) {
+        return get(aKey, Date.class);
     }
 
     @Override
@@ -313,5 +244,28 @@ public class MapObject  implements  Map<String ,Object>, Context {
     public Duration getDuration(Object aKey, String aDefaultDuration) {
         Duration value = getDuration(aKey);
         return value!=null?value:Duration.parse("PT"+aDefaultDuration);
+    }
+
+    @Override
+    public void set(String aKey, Object aValue) {
+        put(aKey, aValue);
+    }
+
+    @Override
+    public void setIfNull(String aKey, Object aValue) {
+        if(get(aKey)==null) {
+            set(aKey, aValue);
+        }
+    }
+
+    @Override
+    public long increment(String aKey) {
+        Long counter = getLong(aKey);
+        if(counter == null) {
+            counter = 0L;
+        }
+        counter++;
+        set(aKey, counter);
+        return counter;
     }
 }

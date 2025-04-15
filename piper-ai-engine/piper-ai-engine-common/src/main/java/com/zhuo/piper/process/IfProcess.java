@@ -2,7 +2,7 @@ package com.zhuo.piper.process;
 
 import com.zhuo.piper.context.task.execution.TaskExecution;
 import com.zhuo.piper.save.DagService;
-import com.zhuo.piper.scheduler.DAG;
+import com.zhuo.piper.struct.DAG;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 

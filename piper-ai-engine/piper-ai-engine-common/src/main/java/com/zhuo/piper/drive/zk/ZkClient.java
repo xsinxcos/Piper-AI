@@ -11,16 +11,9 @@ import org.springframework.stereotype.Component;
 public class ZkClient implements RpcClient {
 
     @Override
-    public void trigger(TopicMessage param) {
+    public Object trigger(TopicMessage param) {
         String baseUrl = param.getTopicName();
         HttpClient client = new HttpClient(baseUrl);
-        client.post("/trigger", JsonUtils.toJson(param), JsonNode.class);
-    }
-
-    @Override
-    public void fin(TopicMessage param) {
-        String baseUrl = param.getTopicName();
-        HttpClient client = new HttpClient(baseUrl);
-        client.post("/fin", JsonUtils.toJson(param), JsonNode.class);
+        return client.post("/trigger", JsonUtils.toJson(param), JsonNode.class);
     }
 }

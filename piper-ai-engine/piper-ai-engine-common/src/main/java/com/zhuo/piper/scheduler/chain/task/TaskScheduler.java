@@ -4,12 +4,13 @@ import com.zhuo.piper.context.task.execution.TaskExecution;
 import com.zhuo.piper.drive.EventDrive;
 import com.zhuo.piper.drive.Topic;
 import com.zhuo.piper.drive.TopicMessage;
-import com.zhuo.piper.scheduler.DAG;
-import com.zhuo.piper.scheduler.Scheduler;
+import com.zhuo.piper.struct.DAG;
+import com.zhuo.piper.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.utils.JsonUtils;
+import org.springframework.stereotype.Component;
 
-
-public class TaskScheduler implements Scheduler {
+@Component
+public class TaskScheduler extends AbstractSchedulerChain {
 
     private final EventDrive eventDrive;
 
@@ -17,10 +18,10 @@ public class TaskScheduler implements Scheduler {
         this.eventDrive = eventDrive;
     }
 
+
     @Override
     public void run(TaskExecution aTask, DAG dag) {
-        Object input = aTask.getInput();
         String trace = aTask.getString("trace");
-        eventDrive.schedule(new TopicMessage(Topic.START.getTopic(), trace, JsonUtils.toJson(input)));
+        Object output = eventDrive.schedule(new TopicMessage(Topic.START.getTopic(), trace, JsonUtils.toJson(aTask)));
     }
 }

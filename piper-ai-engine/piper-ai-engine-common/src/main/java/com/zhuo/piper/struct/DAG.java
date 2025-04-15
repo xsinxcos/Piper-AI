@@ -1,9 +1,5 @@
-package com.zhuo.piper.scheduler;
+package com.zhuo.piper.struct;
 
-import com.zhuo.piper.context.task.execution.TaskExecution;
-import com.zhuo.piper.context.Node;
-import com.zhuo.piper.process.ProcessType;
-import com.zhuo.piper.task.Handler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DAG {
     // 所有节点Map，Key为节点ID，Value为节点处理器
-    private final Map<String, Node> nodes = new ConcurrentHashMap<>();
+    private final Map<String, DagNode> nodes = new ConcurrentHashMap<>();
     
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
     private final Map<String, List<String>> edges = new ConcurrentHashMap<>();
@@ -27,27 +23,34 @@ public class DAG {
     // 入度表，用于拓扑排序
     private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
-    private final Map<String ,NodeConfig> configMap = new ConcurrentHashMap<>();
-
-    @Getter
     @AllArgsConstructor
-    static
-    class NodeConfig {
-        private String nodeId;
-        private TaskExecution context;
+    @Getter
+    public static class DagNode {
+        private String id;
+        private Integer type;
+        private String config;
+        private String className;
+        private Boolean isLock;
+
+        public DagNode(String id, Integer type, String config, String className) {
+            this.id = id;
+            this.type = type;
+            this.config = config;
+            this.className = className;
+            this.isLock = false;
+        }
+
+        public void lock(){
+            this.isLock = true;
+        }
+
+        public void unLock() {
+            this.isLock = false;
+        }
     }
-    /**
-     * 添加节点
-     * 
-     * @param nodeId 节点ID
-     * @param handler 节点处理器
-     * @param type 节点类型
-     * @return 当前DAG实例
-     */
-    public DAG addNode(String nodeId, Handler<?> handler, ProcessType type) {
-        nodes.put(nodeId, handler);
-        inDegrees.putIfAbsent(nodeId, 0);
-        return this;
+
+    public DagNode getNode(String nodeId) {
+        return nodes.get(nodeId);
     }
     
     /**
@@ -56,7 +59,7 @@ public class DAG {
      * @param nodeId 节点ID
      * @return 当前DAG实例
      */
-    public DAG addNode(String nodeId, Node node) {
+    public DAG addNode(String nodeId, DagNode node) {
         nodes.put(nodeId, node);
         inDegrees.putIfAbsent(nodeId, 0);
         return this;
@@ -176,8 +179,8 @@ public class DAG {
      * @param nodeId 当前节点ID
      * @return 下一个Handler的Map（key为节点ID，value为Handler）
      */
-    public Map<String, Node> getNextHandler(String nodeId) {
-        Map<String, Node> nextHandlers = new HashMap<>();
+    public Map<String, DagNode> getNextHandler(String nodeId) {
+        Map<String, DagNode> nextHandlers = new HashMap<>();
         
         // 获取当前节点的所有后续节点
         List<String> nextNodeIds = edges.getOrDefault(nodeId, Collections.emptyList());
@@ -193,7 +196,7 @@ public class DAG {
      * 
      * @return 节点Map
      */
-    public Map<String, Node> getNodes() {
+    public Map<String, DagNode> getNodes() {
         return Collections.unmodifiableMap(nodes);
     }
     
@@ -219,10 +222,10 @@ public class DAG {
     /**
      * 获取 入度为 0 的节点
      */
-    public List<String> getZeroInDegreeNodes(){
+    public List<String> getZeroInDegreeAndNoLockNodes(){
         List<String> zeroInInDegreeNodes = new ArrayList<>();
         inDegrees.forEach((k ,v) -> {
-            if(v == 0){
+            if(v == 0 && !nodes.get(k).getIsLock()){
                 zeroInInDegreeNodes.add(k);
             }
         });
@@ -298,11 +301,11 @@ public class DAG {
         List<String> originalNextNodes = edges.getOrDefault(targetNodeId, new ArrayList<>());
         
         // 获取要插入的DAG的所有节点和边
-        Map<String, Node> otherNodes = otherDAG.getNodes();
+        Map<String, DagNode> otherNodes = otherDAG.getNodes();
         Map<String, List<String>> otherEdges = otherDAG.getEdges();
 
         // 添加所有新节点
-        for (Map.Entry<String, Node> entry : otherNodes.entrySet()) {
+        for (Map.Entry<String, DagNode> entry : otherNodes.entrySet()) {
             this.addNode(entry.getKey(), entry.getValue());
         }
 
@@ -315,7 +318,7 @@ public class DAG {
         }
 
         // 获取要插入的DAG的入度为0的节点（起始节点）
-        List<String> startNodes = otherDAG.getZeroInDegreeNodes();
+        List<String> startNodes = otherDAG.getZeroInDegreeAndNoLockNodes();
 
         // 将目标节点连接到新DAG的所有起始节点
         for (String startNode : startNodes) {
@@ -370,6 +373,20 @@ public class DAG {
         }
 
         return this;
+    }
+
+    public DAG deepCopy() {
+        DAG copy = new DAG();
+        for (Map.Entry<String, DagNode> entry : nodes.entrySet()) {
+            copy.addNode(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+            String fromNodeId = entry.getKey();
+            for (String toNodeId : entry.getValue()) {
+                copy.addEdge(fromNodeId, toNodeId);
+            }
+        }
+        return copy;
     }
 
 }

@@ -2,7 +2,7 @@ package com.zhuo.piper.controller;
 
 import com.zhuo.piper.context.MapObject;
 import com.zhuo.piper.save.DagService;
-import com.zhuo.piper.scheduler.DAG;
+import com.zhuo.piper.struct.DAG;
 import com.zhuo.piper.scheduler.SchedulerCenter;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;

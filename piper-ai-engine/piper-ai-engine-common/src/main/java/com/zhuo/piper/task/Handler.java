@@ -1,7 +1,6 @@
 package com.zhuo.piper.task;
 
 
-import com.zhuo.piper.context.Node;
 import com.zhuo.piper.context.task.execution.TaskExecution;
 
 /**
@@ -9,6 +8,6 @@ import com.zhuo.piper.context.task.execution.TaskExecution;
  *
  * @param <O>
  */
-public interface Handler<O> extends Node {
+public interface Handler<O> {
     O handle(TaskExecution aTask) throws Exception;
 }

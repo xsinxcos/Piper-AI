@@ -1,16 +1,13 @@
 package com.zhuo.piper.save;
 
 import cn.zhuo.domain.common.util.SnowflakeIdGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.zhuo.piper.context.Node;
 import com.zhuo.piper.save.entity.DagEdge;
 import com.zhuo.piper.save.entity.DagEntity;
 import com.zhuo.piper.save.entity.DagNode;
 import com.zhuo.piper.save.mapper.DagEdgeMapper;
 import com.zhuo.piper.save.mapper.DagEntityMapper;
 import com.zhuo.piper.save.mapper.DagNodeMapper;
-import com.zhuo.piper.scheduler.DAG;
-import com.zhuo.piper.task.Handler;
+import com.zhuo.piper.struct.DAG;
 import com.zhuo.piper.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
@@ -64,14 +61,14 @@ public class DagService{
     }
 
     private List<DagNode> getDagNodes(DAG dag, DagEntity dagEntity) {
-        Map<String, Node> nodes = dag.getNodes();
+        Map<String, DAG.DagNode> nodes = dag.getNodes();
         List<DagNode> saveNodes = new ArrayList<>();
         nodes.forEach((k ,v) -> {
             String config = JsonUtils.toJson(v);
             DagNode dagNode = DagNode.builder()
                     .id(k)
                     .dagId(dagEntity.getId())
-                    .type(getType(v))
+                    .type(v.getType())
                     .config(config)
                     .nodeClass(v.getClass().getName())
                     .version(0L)
@@ -88,15 +85,6 @@ public class DagService{
             return null;
         }
         return buildDAG(dagEntity.getId());
-    }
-
-    private Integer getType(Node node){
-        if(node instanceof Process){
-            return 1;
-        }else if(node instanceof Handler<?>){
-            return 0;
-        }
-        return -1;
     }
 
     public DAG loadSubDag(String subDagId){
@@ -119,15 +107,9 @@ public class DagService{
 
         // 重建节点
         for (DagNode dagNode : dagNodes) {
-            try {
-                // 从配置中重建节点
-                String config = dagNode.getConfig();
-                JsonNode jsonNodeConfig = JsonUtils.toJsonNode(config);
-                Node node = (Node) JsonUtils.fromJsonNode(jsonNodeConfig, Class.forName(dagNode.getNodeClass()));
-                dag.addNode(dagNode.getId(), node);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Failed to load node class: " + dagNode.getNodeClass(), e);
-            }
+            // 从配置中重建节点
+            DAG.DagNode node = new DAG.DagNode(dagNode.getId(), dagNode.getType(), dagNode.getConfig(), dagNode.getNodeClass());
+            dag.addNode(dagNode.getId(), node);
         }
 
         // 重建边

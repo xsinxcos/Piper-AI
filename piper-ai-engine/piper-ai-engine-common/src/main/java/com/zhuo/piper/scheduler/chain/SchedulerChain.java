@@ -1,17 +1,17 @@
 package com.zhuo.piper.scheduler.chain;
 
 import com.zhuo.piper.context.task.execution.TaskExecution;
-import com.zhuo.piper.scheduler.DAG;
-import com.zhuo.piper.scheduler.Scheduler;
+import com.zhuo.piper.struct.DAG;
+import com.zhuo.piper.scheduler.IScheduler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class SchedulerChain {
-    private final List<Scheduler> schedulerChain;
+    private final List<IScheduler> schedulerChain;
 
-    public SchedulerChain(List<Scheduler> schedulerChain) {
+    public SchedulerChain(List<IScheduler> schedulerChain) {
         this.schedulerChain = schedulerChain;
     }
 

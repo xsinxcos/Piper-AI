@@ -2,7 +2,6 @@ package com.zhuo.piper.context;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -68,15 +67,6 @@ public interface Accessor {
    */
   String getString (Object aKey);
 
-  /**
-   * Return the array value associated with the given
-   * key.
-   * 
-   * @param aKey
-   *          The key associated with the desired value.
-   * @return The array value.
-   */
-  <T> T[] getArray (Object aKey, Class<T> aElementType);
   
   /**
    * Return the {@link MapObject} value associated with the given
@@ -152,34 +142,8 @@ public interface Accessor {
    *         converting to {@link String} as needed.
    */
   String getString (Object aKey, String aDefaultValue);
-  
-  /**
-   * Return the {@link List} of items associated with the given
-   * key.
-   * 
-   * @param aKey
-   *          The key associated with the desired value.
-   * @param aElementType
-   *          The type of the list elements.
-   * @return The list of items
-   */
-  <T> List<T> getList (Object aKey, Class<T> aElementType);
-  
-  /**
-   * Return the {@link List} of items associated with the given
-   * key.
-   * 
-   * @param aKey
-   *          The key associated with the desired value.
-   * @param aElementType
-   *          The type of the list elements.
-   * @param aDefaultValue
-   *          The list value to return none was not found
-   *          for the given key or if the value is null.
-   * @return The list of items
-   */
-  <T> List<T> getList (Object aKey, Class<T> aElementType, List<T> aDefaultValue);
-  
+
+
   /**
    * Return the {@link Long} value associated with the given
    * key -- converting as necessary.
@@ -303,17 +267,7 @@ public interface Accessor {
    *         converting as needed.
    */
   boolean getBoolean (Object aKey, boolean aDefaultValue);
-  
-  /**
-   * Return the {@link Date} value associated with the given
-   * key -- converting as necessary.
-   * 
-   * @param aKey
-   *          The key associated with the desired value.
-   * @return The {@link Date} value associated with the given key --
-   *         converting as needed.
-   */
-  Date getDate (Object aKey);
+
   
   /**
    * Return the {@link Duration} value associated with the given
@@ -345,5 +299,7 @@ public interface Accessor {
    * @return {@link Map}
    */
   Map<String, Object> asMap ();
+
+  Date getDate(Object aKey);
   
 }
