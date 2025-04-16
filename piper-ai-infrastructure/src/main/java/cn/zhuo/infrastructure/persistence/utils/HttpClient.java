@@ -1,6 +1,6 @@
 package cn.zhuo.infrastructure.persistence.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -18,11 +18,11 @@ import java.util.Map;
  */
 @Slf4j
 public class HttpClient {
-    
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final String baseUrl;
-    
+
     /**
      * 构造函数
      *
@@ -33,126 +33,120 @@ public class HttpClient {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
     }
-    
+
     /**
      * 发送GET请求
      *
      * @param path 请求路径
      * @param params 查询参数
-     * @param responseType 响应类型
      * @return 响应结果
      */
-    public <T> T get(String path, Map<String, String> params, Class<T> responseType) {
+    public JsonNode get(String path, Map<String, String> params) {
         String url = buildUrl(path, params);
         HttpHeaders headers = createHeaders();
         HttpEntity<?> entity = new HttpEntity<>(headers);
-        
-        ResponseEntity<T> response = restTemplate.exchange(
+
+        ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.GET,
             entity,
-            responseType
+            String.class
         );
-        
-        return response.getBody();
+
+        return convertToJsonNode(response.getBody());
     }
-    
+
     /**
      * 发送POST请求
      *
      * @param path 请求路径
      * @param body 请求体
-     * @param responseType 响应类型
      * @return 响应结果
      */
-    public <T> T post(String path, Object body, Class<T> responseType) {
+    public JsonNode post(String path, Object body) {
         String url = buildUrl(path, null);
         HttpHeaders headers = createHeaders();
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
-        
-        ResponseEntity<T> response = restTemplate.exchange(
+
+        ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.POST,
             entity,
-            responseType
+            String.class
         );
-        
-        return response.getBody();
+        return convertToJsonNode(response.getBody());
     }
-    
+
     /**
      * 发送PUT请求
      *
      * @param path 请求路径
      * @param body 请求体
-     * @param responseType 响应类型
      * @return 响应结果
      */
-    public <T> T put(String path, Object body, Class<T> responseType) {
+    public JsonNode put(String path, Object body) {
         String url = buildUrl(path, null);
         HttpHeaders headers = createHeaders();
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
-        
-        ResponseEntity<T> response = restTemplate.exchange(
+
+        ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.PUT,
             entity,
-            responseType
+            String.class
         );
-        
-        return response.getBody();
+
+        return convertToJsonNode(response.getBody());
     }
-    
+
     /**
      * 发送DELETE请求
      *
      * @param path 请求路径
-     * @param responseType 响应类型
      * @return 响应结果
      */
-    public <T> T delete(String path, Class<T> responseType) {
+    public JsonNode delete(String path) {
         String url = buildUrl(path, null);
         HttpHeaders headers = createHeaders();
         HttpEntity<?> entity = new HttpEntity<>(headers);
-        
-        ResponseEntity<T> response = restTemplate.exchange(
+
+        ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.DELETE,
             entity,
-            responseType
+            String.class
         );
-        
-        return response.getBody();
+
+        return convertToJsonNode(response.getBody());
     }
-    
+
     /**
      * 发送表单数据
      *
      * @param path 请求路径
      * @param formData 表单数据
-     * @param responseType 响应类型
      * @return 响应结果
      */
-    public <T> T postForm(String path, Map<String, String> formData, Class<T> responseType) {
+    public JsonNode postForm(String path, Map<String, String> formData) {
         String url = buildUrl(path, null);
         HttpHeaders headers = createHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        
+
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         formData.forEach(map::add);
-        
+
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-        
-        ResponseEntity<T> response = restTemplate.exchange(
+
+        ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.POST,
             entity,
-            responseType
+            String.class
         );
-        
-        return response.getBody();
+
+        return convertToJsonNode(response.getBody());
     }
-    
+
     /**
      * 构建完整的URL
      *
@@ -162,14 +156,14 @@ public class HttpClient {
      */
     private String buildUrl(String path, Map<String, String> params) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl).path(path);
-        
+
         if (params != null) {
             params.forEach(builder::queryParam);
         }
-        
+
         return builder.build().toUriString();
     }
-    
+
     /**
      * 创建HTTP请求头
      *
@@ -181,17 +175,16 @@ public class HttpClient {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         return headers;
     }
-    
+
     /**
-     * 将响应转换为指定类型
+     * 将响应字符串转换为JsonNode
      *
      * @param response 响应内容
-     * @param typeReference 类型引用
-     * @return 转换后的对象
+     * @return JsonNode对象
      */
-    public <T> T convertResponse(Object response, TypeReference<T> typeReference) {
+    private JsonNode convertToJsonNode(String response) {
         try {
-            return objectMapper.convertValue(response, typeReference);
+            return objectMapper.readTree(response);
         } catch (Exception e) {
             log.error("响应转换失败", e);
             throw new RuntimeException("响应转换失败", e);

@@ -1,5 +1,6 @@
 package com.zhuo.piper.worker.impl;
 
+import cn.zhuo.infrastructure.persistence.response.Result;
 import com.zhuo.piper.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.context.task.execution.TaskExecution;
 import com.zhuo.piper.drive.TopicMessage;
@@ -24,14 +25,14 @@ public class ZkWorker implements IWorker {
     private HandlerFactory handlerFactory;
         
     @PostMapping("/start")
-    public String start(@RequestBody TopicMessage topicMessage) throws Exception {
+    public Result<String> start(@RequestBody TopicMessage topicMessage) throws Exception {
         String msg = topicMessage.getMsg();
         Map<String, Object> map = JsonUtils.jsonToMap(msg);
 
         SimpleTaskExecution execution = JsonUtils.mapToObject(map ,"TaskExecution" , SimpleTaskExecution.class);
         DAG dag = JsonUtils.mapToObject(map , "dag" , DAG.class);
         String className = dag.getNode(execution.getDagNodeId()).getClassName();
-        return (String) handlerFactory.getInstance(className).handle(execution);
+        return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
     }
 
     @Override

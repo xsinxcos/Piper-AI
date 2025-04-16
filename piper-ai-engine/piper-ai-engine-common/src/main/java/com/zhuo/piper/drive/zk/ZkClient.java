@@ -28,7 +28,7 @@ public class ZkClient implements RpcClient , DisposableBean {
         ServiceInstance<TopicMessage> send = zkServiceFactory.getInstance();
         String realIp = String.format(ip, send.getAddress(), send.getPort());
         HttpClient client = new HttpClient(realIp);
-        return client.post("/" + param.getTopicName(), param, Object.class);
+        return client.post("/" + param.getTopicName(), param).get("data");
     }
 
     @Override
