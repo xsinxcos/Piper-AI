@@ -2,6 +2,7 @@ package com.zhuo.piper.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.Optional;
 
 public class JsonUtils {
@@ -160,5 +162,34 @@ public class JsonUtils {
             return Optional.empty();
         }
     }
+
+    /**
+     * 将 json (string) 转化为 指定对象
+     */
+    public static <T> T fromJsonNode(String jsonStr, Class<T> targetType) {
+        try {
+            return defaultMapper.readValue(jsonStr, targetType);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON解析失败: " + e.getOriginalMessage(), e);
+        }
+    }
+    /**
+     * 将 json (string) 转化为 指定对象
+     */
+    /**
+     * 将JSON字符串反序列化为Map<String, Object>
+     */
+    public static Map<String, Object> jsonToMap(String json) throws Exception {
+        return defaultMapper.readValue(json, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 从Map中提取指定键的值，并转换为目标类型
+     */
+    public static <T> T mapToObject(Map<String, Object> map, String key, Class<T> targetType) {
+        return defaultMapper.convertValue(map.get(key), targetType);
+    }
+
 
 }

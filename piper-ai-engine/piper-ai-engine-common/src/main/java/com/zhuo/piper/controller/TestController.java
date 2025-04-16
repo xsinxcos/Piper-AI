@@ -1,9 +1,8 @@
 package com.zhuo.piper.controller;
 
-import com.zhuo.piper.context.MapObject;
+import com.zhuo.piper.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.save.DagService;
-import com.zhuo.piper.struct.DAG;
-import com.zhuo.piper.scheduler.SchedulerCenter;
+import com.zhuo.piper.scheduler.Scheduler;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("hello")
 public class TestController {
     @Resource
-    SchedulerCenter schedulerCenter;
+    Scheduler schedule;
 
     @Resource
     DagService dagService;
@@ -21,9 +20,9 @@ public class TestController {
 
     @GetMapping("/test")
     public String test(){
-        DAG load = dagService.load("1");
-
-        schedulerCenter.schedule(load , MapObject.getInstance());
+        dagService.load("1").ifPresent(item -> {
+            schedule.run(item ,new SimpleTaskExecution());
+        });
         return "success";
     }
 }

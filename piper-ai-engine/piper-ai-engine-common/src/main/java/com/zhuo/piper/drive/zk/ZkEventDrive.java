@@ -3,19 +3,14 @@ package com.zhuo.piper.drive.zk;
 import com.zhuo.piper.drive.EventDrive;
 import com.zhuo.piper.drive.RpcClient;
 import com.zhuo.piper.drive.TopicMessage;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.apache.curator.x.discovery.ServiceInstance;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
-public class ZkEventDrive implements EventDrive , DisposableBean {
+public class ZkEventDrive implements EventDrive{
 
 
-    private ServiceInstance<TopicMessage> instance;
 
     @Resource
     private ZkServiceFactory zkServiceFactory;
@@ -24,22 +19,9 @@ public class ZkEventDrive implements EventDrive , DisposableBean {
     private RpcClient rpcClient;
 
 
-    @PostConstruct
-    void init() throws Exception {
-        instance = zkServiceFactory.register();
-    }
-
     @Override
     public Object schedule(TopicMessage topicMessage) {
         ServiceInstance<TopicMessage> instance = zkServiceFactory.getInstance();
-        rpcClient.trigger(new TopicMessage( "http://"+instance.getAddress() + ":" + instance.getPort() ,
-                UUID.randomUUID().toString() ,
-                "test"));
-        return null;
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        zkServiceFactory.destroy(instance);
+        return rpcClient.trigger(topicMessage);
     }
 }

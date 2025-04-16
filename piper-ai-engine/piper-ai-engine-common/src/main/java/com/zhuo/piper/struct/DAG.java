@@ -2,9 +2,13 @@ package com.zhuo.piper.struct;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
-public class DAG {
+public class DAG implements Serializable {
     // 所有节点Map，Key为节点ID，Value为节点处理器
     private final Map<String, DagNode> nodes = new ConcurrentHashMap<>();
     
@@ -24,8 +28,10 @@ public class DAG {
     private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
     @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
-    public static class DagNode {
+    @Setter
+    public static class DagNode implements Serializable{
         private String id;
         private Integer type;
         private String config;
@@ -137,41 +143,7 @@ public class DAG {
         // 如果访问的节点数量小于总节点数，说明存在环
         return visitedCount < nodes.size();
     }
-    
-    /**
-     * 获取拓扑排序的节点顺序
-     * 
-     * @return 拓扑排序的节点ID列表
-     */
-    public List<String> getTopologicalOrder() {
-        List<String> result = new ArrayList<>();
-        Map<String, Integer> inDegreeCopy = new HashMap<>(inDegrees);
-        Queue<String> queue = new LinkedList<>();
-        
-        // 将入度为0的节点加入队列
-        for (Map.Entry<String, Integer> entry : inDegreeCopy.entrySet()) {
-            if (entry.getValue() == 0) {
-                queue.offer(entry.getKey());
-            }
-        }
-        
-        while (!queue.isEmpty()) {
-            String node = queue.poll();
-            result.add(node);
-            
-            List<String> neighbors = edges.getOrDefault(node, Collections.emptyList());
-            for (String neighbor : neighbors) {
-                int degree = inDegreeCopy.get(neighbor) - 1;
-                inDegreeCopy.put(neighbor, degree);
-                
-                if (degree == 0) {
-                    queue.offer(neighbor);
-                }
-            }
-        }
-        
-        return result.size() == nodes.size() ? result : Collections.emptyList();
-    }
+
     
     /**
      * 根据节点ID获取下一个Handler
@@ -375,18 +347,16 @@ public class DAG {
         return this;
     }
 
+
+
     public DAG deepCopy() {
-        DAG copy = new DAG();
-        for (Map.Entry<String, DagNode> entry : nodes.entrySet()) {
-            copy.addNode(entry.getKey(), entry.getValue());
+        // 通过序列化进行深拷贝
+        try {
+            return SerializationUtils.clone(this);
+        } catch (Exception e) {
+            log.error("深拷贝失败", e);
+            throw new RuntimeException("深拷贝失败", e);
         }
-        for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
-            String fromNodeId = entry.getKey();
-            for (String toNodeId : entry.getValue()) {
-                copy.addEdge(fromNodeId, toNodeId);
-            }
-        }
-        return copy;
     }
 
 }

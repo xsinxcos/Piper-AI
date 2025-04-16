@@ -48,7 +48,7 @@ public class Scheduler {
         schedulerChain = assignScheduler;
     }
 
-    void run(DAG dag , TaskExecution execution) {
+    public void run(DAG dag , TaskExecution execution) {
         schedulerChain.run(execution , dag);
     }
 }

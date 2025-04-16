@@ -73,9 +73,18 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
         set(DSL.EXECUTION_TIME, executionTime);
     }
 
+    public void setDagNodeId(String dagNodeId){
+        set(DSL.DAG_NODE_ID, dagNodeId);
+    }
+
     @Override
     public String getId() {
         return getString(DSL.ID);
+    }
+
+    @Override
+    public String getDagNodeId() {
+        return getString(DSL.DAG_NODE_ID);
     }
 
     @Override

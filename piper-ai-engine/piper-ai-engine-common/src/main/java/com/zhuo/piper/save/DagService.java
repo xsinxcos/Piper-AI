@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class DagService{
@@ -78,7 +79,7 @@ public class DagService{
         return saveNodes;
     }
 
-    public DAG load(String dagId){
+    public  Optional<DAG>  load(String dagId){
         // 获取最新的DAG实体
         DagEntity dagEntity = dagEntityMapper.selectLatest(dagId);
         if (dagEntity == null) {
@@ -87,7 +88,7 @@ public class DagService{
         return buildDAG(dagEntity.getId());
     }
 
-    public DAG loadSubDag(String subDagId){
+    public Optional<DAG> loadSubDag(String subDagId){
         // 获取最新的DAG实体
         DagEntity dagEntity = dagEntityMapper.selectById(subDagId);
         if (dagEntity == null) {
@@ -96,7 +97,7 @@ public class DagService{
         return buildDAG(dagEntity.getId());
     }
 
-    private DAG buildDAG(String dagId){
+    private Optional<DAG>  buildDAG(String dagId){
         // 加载所有节点
         List<DagNode> dagNodes = nodeMapper.selectByDagId(dagId);
         // 加载所有边
@@ -116,6 +117,6 @@ public class DagService{
         for (DagEdge dagEdge : dagEdges) {
             dag.addEdge(dagEdge.getFromNodeId(), dagEdge.getToNodeId());
         }
-        return dag;
+        return Optional.of(dag);
     }
 }

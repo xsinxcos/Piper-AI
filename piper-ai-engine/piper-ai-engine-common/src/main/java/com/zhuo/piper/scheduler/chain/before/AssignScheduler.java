@@ -9,9 +9,12 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -28,7 +31,7 @@ public class AssignScheduler extends AbstractSchedulerChain {
         while (!dag.getZeroInDegreeAndNoLockNodes().isEmpty()) {
             // 获取没有 Lock 且 入度为 0 的节点
             List<String> zeroInDegreeNodes = dag.getZeroInDegreeAndNoLockNodes();
-            // 入度为 0 的节点先进行 Lock 防止并发重复执行
+            // 入度为 0 的节点先进行 Lock 防止重复执行
             for (String nodeId : zeroInDegreeNodes) {
                 dag.getNode(nodeId).lock();
             }
@@ -36,30 +39,39 @@ public class AssignScheduler extends AbstractSchedulerChain {
             List<CompletableFuture<List<Object>>> futures = new ArrayList<>();
             // 异步
             DAG finalDag = dag;
+            TaskExecution finalATask = aTask;
             zeroInDegreeNodes.forEach(id -> {
                 CompletableFuture<List<Object>> future = CompletableFuture.supplyAsync(() -> {
                     List<Object> re = new ArrayList<>();
-                    SimpleTaskExecution taskExecution = new SimpleTaskExecution();
                     DAG copy = finalDag.deepCopy();
                     // 将需要的节点进行 unLock
                     copy.getNode(id).unLock();
-                    handleNext(aTask ,copy);
+                    handleNext(finalATask,copy);
                     re.add(copy);
-                    re.add(taskExecution);
+                    re.add(deepCopyTaskExecution(finalATask));
                     return re;
                 }, executor);
                 futures.add(future);
             });
             // 获取所有的结果
             List<DAG> dags = new ArrayList<>();
-            List<TaskExecution> taskExecutions = new ArrayList<>();
+            Map<String ,Object> taskExecutionsMap = new HashMap<>();
             for (CompletableFuture<List<Object>> future : futures) {
                 List<Object> objects = future.get();
                 dags.add((DAG) objects.get(0));
-                taskExecutions.add((TaskExecution) objects.get(1));
+                TaskExecution execution = (TaskExecution) objects.get(1);
+                taskExecutionsMap.put(execution.getId() ,execution.getOutput());
             }
             // 计算出最新的 Dag
             dag = DagUtils.getIntersection(dags);
+            // 计算出最新的 TaskExecution
+            SimpleTaskExecution simpleTaskExecution = SimpleTaskExecution.of(aTask);
+            simpleTaskExecution.setInput(taskExecutionsMap);
+            aTask = simpleTaskExecution;
         }
+    }
+
+    private TaskExecution deepCopyTaskExecution(TaskExecution taskExecution) {
+        return SerializationUtils.clone(taskExecution);
     }
 }

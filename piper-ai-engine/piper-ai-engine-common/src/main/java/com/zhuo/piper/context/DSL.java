@@ -7,6 +7,8 @@ public class DSL {
   public static final String PARENT_ID = "parentId";
   
   public static final String JOB_ID = "jobId";
+
+  public static final String DAG_NODE_ID = "dagNodeId";
   
   public static final String LABEL = "label";
   

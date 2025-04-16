@@ -4,18 +4,21 @@ package com.zhuo.piper.context.task.execution;
 import com.zhuo.piper.context.Accessor;
 import com.zhuo.piper.task.TaskStatus;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 任务上下文接口
  */
-public interface TaskExecution extends Accessor {
+public interface TaskExecution extends Accessor , Serializable {
     /**
      * Get the unique id of the task instance.
      *
      * @return String the id
      */
     String getId ();
+
+    String getDagNodeId();
 
     /**
      * Get the id of the parent task, if this

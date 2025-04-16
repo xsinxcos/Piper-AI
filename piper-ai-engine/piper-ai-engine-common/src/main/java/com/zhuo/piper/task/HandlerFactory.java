@@ -14,7 +14,9 @@ public class HandlerFactory {
     private static final Map<String, Handler<?>> instances = new ConcurrentHashMap<>();
 
     public HandlerFactory(List<Handler<?>> handlers) {
-        handlers.forEach(handler -> {instances.put(handler.getClass().getSimpleName(), handler);});
+        for (Handler<?> handler : handlers) {
+            instances.put(handler.getClass().getName(), handler);
+        }
     }
 
     /**
