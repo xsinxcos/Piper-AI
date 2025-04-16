@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("hello")
 public class TestController {
@@ -19,10 +21,12 @@ public class TestController {
 
 
     @GetMapping("/test")
-    public String test(){
+    public String test() {
+        SimpleTaskExecution execution = new SimpleTaskExecution();
         dagService.load("1").ifPresent(item -> {
-            schedule.run(item ,new SimpleTaskExecution());
+            schedule.run(item ,execution);
         });
-        return "success";
+        HashMap<String, Object> output = (HashMap<String, Object>) execution.getOutput();
+        return output.get("1").toString();
     }
 }

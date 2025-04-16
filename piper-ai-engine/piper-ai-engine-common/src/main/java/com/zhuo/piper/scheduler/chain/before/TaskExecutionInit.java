@@ -19,15 +19,17 @@ public class TaskExecutionInit  extends AbstractSchedulerChain {
         // 获取没有 Lock 且 入度为 0 的节点，一般情况下为唯一
         List<String> zeroInDegreeNodes = dag.getZeroInDegreeAndNoLockNodes();
         String getNodeId = zeroInDegreeNodes.get(0);
-
+        SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         // 现在的 task 为 上一个节点的 task，需要初始化
-        SimpleTaskExecution execution = new SimpleTaskExecution();
-        execution.set(aTask.getDagNodeId() ,aTask.getOutput());
-        execution.setStartTime(new Date());
-        execution.setId(SnowflakeIdGenerator.getInstance().nextIdStr());
-        execution.setDagNodeId(getNodeId);
-        execution.setStatus(TaskStatus.CREATING);
-        execution.setInput(dag.getNode(getNodeId).getConfig());
-        handleNext(execution ,dag);
+        if(aTask.getDagNodeId() != null){
+            task.set(aTask.getDagNodeId() ,aTask.getOutput());
+        }
+        task.setStartTime(new Date());
+        task.setId(SnowflakeIdGenerator.getInstance().nextIdStr());
+        task.setDagNodeId(getNodeId);
+        task.setInput(dag.getNode(getNodeId).getConfig());
+        task.setStatus(TaskStatus.CREATING);
+
+        handleNext(task ,dag);
     }
 }

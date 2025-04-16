@@ -39,16 +39,17 @@ public class AssignScheduler extends AbstractSchedulerChain {
             List<CompletableFuture<List<Object>>> futures = new ArrayList<>();
             // 异步
             DAG finalDag = dag;
-            TaskExecution finalATask = aTask;
+            SimpleTaskExecution finalATask = (SimpleTaskExecution)aTask;
             zeroInDegreeNodes.forEach(id -> {
                 CompletableFuture<List<Object>> future = CompletableFuture.supplyAsync(() -> {
                     List<Object> re = new ArrayList<>();
                     DAG copy = finalDag.deepCopy();
+                    SimpleTaskExecution copyTaskExecution = deepCopyTaskExecution(finalATask);
                     // 将需要的节点进行 unLock
                     copy.getNode(id).unLock();
-                    handleNext(finalATask,copy);
+                    handleNext(copyTaskExecution,copy);
                     re.add(copy);
-                    re.add(deepCopyTaskExecution(finalATask));
+                    re.add(copyTaskExecution);
                     return re;
                 }, executor);
                 futures.add(future);
@@ -59,19 +60,18 @@ public class AssignScheduler extends AbstractSchedulerChain {
             for (CompletableFuture<List<Object>> future : futures) {
                 List<Object> objects = future.get();
                 dags.add((DAG) objects.get(0));
-                TaskExecution execution = (TaskExecution) objects.get(1);
-                taskExecutionsMap.put(execution.getId() ,execution.getOutput());
+                TaskExecution execution = (SimpleTaskExecution) objects.get(1);
+                taskExecutionsMap.put(execution.getDagNodeId() ,execution.getOutput());
             }
             // 计算出最新的 Dag
             dag = DagUtils.getIntersection(dags);
-            // 计算出最新的 TaskExecution
-            SimpleTaskExecution simpleTaskExecution = SimpleTaskExecution.of(aTask);
-            simpleTaskExecution.setInput(taskExecutionsMap);
-            aTask = simpleTaskExecution;
+            // 计算出最新的 TaskExecution,但是 aTask 还是需要使用原来的
+            SimpleTaskExecution simpleTaskExecution = (SimpleTaskExecution) aTask;
+            simpleTaskExecution.setOutput(taskExecutionsMap);
         }
     }
 
-    private TaskExecution deepCopyTaskExecution(TaskExecution taskExecution) {
+    private SimpleTaskExecution deepCopyTaskExecution(SimpleTaskExecution taskExecution) {
         return SerializationUtils.clone(taskExecution);
     }
 }

@@ -24,14 +24,14 @@ public class ZkWorker implements IWorker {
     private HandlerFactory handlerFactory;
         
     @PostMapping("/start")
-    public Object start(@RequestBody TopicMessage topicMessage) throws Exception {
+    public String start(@RequestBody TopicMessage topicMessage) throws Exception {
         String msg = topicMessage.getMsg();
         Map<String, Object> map = JsonUtils.jsonToMap(msg);
 
         SimpleTaskExecution execution = JsonUtils.mapToObject(map ,"TaskExecution" , SimpleTaskExecution.class);
         DAG dag = JsonUtils.mapToObject(map , "dag" , DAG.class);
         String className = dag.getNode(execution.getDagNodeId()).getClassName();
-        return handlerFactory.getInstance(className).handle(execution);
+        return (String) handlerFactory.getInstance(className).handle(execution);
     }
 
     @Override
