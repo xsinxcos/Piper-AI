@@ -1,5 +1,6 @@
 package com.zhuo.piper.struct;
 
+import com.zhuo.piper.utils.DagUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,12 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DAG implements Serializable {
     // 所有节点Map，Key为节点ID，Value为节点处理器
+    @Getter
     private final Map<String, DagNode> nodes = new ConcurrentHashMap<>();
     
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
+    @Getter
     private final Map<String, List<String>> edges = new ConcurrentHashMap<>();
     
     // 入度表，用于拓扑排序
+    @Getter
     private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
     @AllArgsConstructor
@@ -92,7 +96,7 @@ public class DAG implements Serializable {
         inDegrees.put(toNodeId, inDegrees.getOrDefault(toNodeId, 0) + 1);
         
         // 检测是否有环
-        if (hasCycle()) {
+        if (DagUtils.hasCycle(this)) {
             // 回退操作
             edges.get(fromNodeId).remove(toNodeId);
             inDegrees.put(toNodeId, inDegrees.get(toNodeId) - 1);
@@ -101,49 +105,6 @@ public class DAG implements Serializable {
         
         return this;
     }
-    
-    /**
-     * 检测图中是否有环
-     * 
-     * @return 是否有环
-     */
-    public boolean hasCycle() {
-        // 复制一份入度表进行拓扑排序
-        Map<String, Integer> inDegreeCopy = new HashMap<>(inDegrees);
-        
-        // 用于拓扑排序的队列
-        Queue<String> queue = new LinkedList<>();
-        
-        // 将入度为0的节点加入队列
-        for (Map.Entry<String, Integer> entry : inDegreeCopy.entrySet()) {
-            if (entry.getValue() == 0) {
-                queue.offer(entry.getKey());
-            }
-        }
-        
-        int visitedCount = 0;
-        
-        while (!queue.isEmpty()) {
-            String node = queue.poll();
-            visitedCount++;
-            
-            // 减少相邻节点的入度
-            List<String> neighbors = edges.getOrDefault(node, Collections.emptyList());
-            for (String neighbor : neighbors) {
-                int degree = inDegreeCopy.get(neighbor) - 1;
-                inDegreeCopy.put(neighbor, degree);
-                
-                // 如果入度变为0，则加入队列
-                if (degree == 0) {
-                    queue.offer(neighbor);
-                }
-            }
-        }
-        
-        // 如果访问的节点数量小于总节点数，说明存在环
-        return visitedCount < nodes.size();
-    }
-
     
     /**
      * 根据节点ID获取下一个Handler
@@ -162,25 +123,6 @@ public class DAG implements Serializable {
         
         return nextHandlers;
     }
-    
-    /**
-     * 获取所有节点
-     * 
-     * @return 节点Map
-     */
-    public Map<String, DagNode> getNodes() {
-        return Collections.unmodifiableMap(nodes);
-    }
-    
-    /**
-     * 获取所有边
-     * 
-     * @return 边关系Map
-     */
-    public Map<String, List<String>> getEdges() {
-        return Collections.unmodifiableMap(edges);
-    }
-
 
     /**
      * 获取图的节点数量
@@ -195,13 +137,7 @@ public class DAG implements Serializable {
      * 获取 入度为 0 的节点
      */
     public List<String> getZeroInDegreeAndNoLockNodes(){
-        List<String> zeroInInDegreeNodes = new ArrayList<>();
-        inDegrees.forEach((k ,v) -> {
-            if(v == 0 && !nodes.get(k).getIsLock()){
-                zeroInInDegreeNodes.add(k);
-            }
-        });
-        return zeroInInDegreeNodes;
+        return DagUtils.getZeroInDegreeAndNoLockNodes(this);
     }
 
     /**
@@ -222,36 +158,7 @@ public class DAG implements Serializable {
      * @throws IllegalStateException 如果节点的入度不为0
      */
     public DAG safeRemoveNode(String nodeId) {
-        // 检查节点是否存在
-        if (!nodes.containsKey(nodeId)) {
-            throw new IllegalArgumentException("节点不存在：" + nodeId);
-        }
-        
-        // 检查入度
-        int inDegree = inDegrees.getOrDefault(nodeId, 0);
-        if (inDegree > 0) {
-            throw new IllegalStateException("无法移除节点 " + nodeId + "，因为其入度为 " + inDegree);
-        }
-        
-        // 移除节点
-        nodes.remove(nodeId);
-        inDegrees.remove(nodeId);
-        
-        // 移除所有以该节点为起点的边
-        List<String> outgoingEdges = edges.remove(nodeId);
-        if (outgoingEdges != null) {
-            // 减少所有目标节点的入度
-            for (String targetNodeId : outgoingEdges) {
-                inDegrees.put(targetNodeId, inDegrees.get(targetNodeId) - 1);
-            }
-        }
-        
-        // 移除所有以该节点为终点的边
-        for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
-            entry.getValue().remove(nodeId);
-        }
-        
-        return this;
+        return DagUtils.safeRemoveNode(this, nodeId);
     }
 
     /**
@@ -264,90 +171,8 @@ public class DAG implements Serializable {
      * @throws IllegalStateException 如果插入后形成环
      */
     public DAG insertDAGAfterNode(String targetNodeId, DAG otherDAG) {
-        // 检查目标节点是否存在
-        if (!nodes.containsKey(targetNodeId)) {
-            throw new IllegalArgumentException("目标节点不存在：" + targetNodeId);
-        }
-
-        // 保存目标节点原来的后续节点
-        List<String> originalNextNodes = edges.getOrDefault(targetNodeId, new ArrayList<>());
-        
-        // 获取要插入的DAG的所有节点和边
-        Map<String, DagNode> otherNodes = otherDAG.getNodes();
-        Map<String, List<String>> otherEdges = otherDAG.getEdges();
-
-        // 添加所有新节点
-        for (Map.Entry<String, DagNode> entry : otherNodes.entrySet()) {
-            this.addNode(entry.getKey(), entry.getValue());
-        }
-
-        // 添加所有新边
-        for (Map.Entry<String, List<String>> entry : otherEdges.entrySet()) {
-            String fromNode = entry.getKey();
-            for (String toNode : entry.getValue()) {
-                this.addEdge(fromNode, toNode);
-            }
-        }
-
-        // 获取要插入的DAG的入度为0的节点（起始节点）
-        List<String> startNodes = otherDAG.getZeroInDegreeAndNoLockNodes();
-
-        // 将目标节点连接到新DAG的所有起始节点
-        for (String startNode : startNodes) {
-            this.addEdge(targetNodeId, startNode);
-        }
-
-        // 找出子DAG的结束节点（出度为0的节点）
-        List<String> endNodes = new ArrayList<>();
-        for (String nodeId : otherNodes.keySet()) {
-            if (!otherEdges.containsKey(nodeId) || otherEdges.get(nodeId).isEmpty()) {
-                endNodes.add(nodeId);
-            }
-        }
-
-        // 将子DAG的结束节点连接到目标节点原来的后续节点
-        for (String endNode : endNodes) {
-            for (String originalNextNode : originalNextNodes) {
-                this.addEdge(endNode, originalNextNode);
-            }
-        }
-
-        // 检查是否形成环
-        if (this.hasCycle()) {
-            // 回退操作：移除所有新添加的边和节点
-            for (String startNode : startNodes) {
-                edges.get(targetNodeId).remove(startNode);
-                inDegrees.put(startNode, inDegrees.get(startNode) - 1);
-            }
-            
-            for (String endNode : endNodes) {
-                for (String originalNextNode : originalNextNodes) {
-                    edges.get(endNode).remove(originalNextNode);
-                    inDegrees.put(originalNextNode, inDegrees.get(originalNextNode) - 1);
-                }
-            }
-            
-            for (Map.Entry<String, List<String>> entry : otherEdges.entrySet()) {
-                String fromNode = entry.getKey();
-                for (String toNode : entry.getValue()) {
-                    edges.get(fromNode).remove(toNode);
-                    inDegrees.put(toNode, inDegrees.get(toNode) - 1);
-                }
-            }
-            
-            for (String nodeId : otherNodes.keySet()) {
-                nodes.remove(nodeId);
-                inDegrees.remove(nodeId);
-                edges.remove(nodeId);
-            }
-            
-            throw new IllegalStateException("插入DAG后形成了环，操作已回退");
-        }
-
-        return this;
+        return DagUtils.insertDAGAfterNode(this, targetNodeId, otherDAG);
     }
-
-
 
     public DAG deepCopy() {
         // 通过序列化进行深拷贝
@@ -358,5 +183,4 @@ public class DAG implements Serializable {
             throw new RuntimeException("深拷贝失败", e);
         }
     }
-
 }
