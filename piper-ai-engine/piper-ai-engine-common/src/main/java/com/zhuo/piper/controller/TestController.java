@@ -24,7 +24,11 @@ public class TestController {
     public String test() {
         SimpleTaskExecution execution = new SimpleTaskExecution();
         dagService.load("1").ifPresent(item -> {
-            schedule.run(item ,execution);
+            try {
+                schedule.run(item ,execution);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
         HashMap<String, Object> output = (HashMap<String, Object>) execution.getOutput();
         return output.get("1").toString();

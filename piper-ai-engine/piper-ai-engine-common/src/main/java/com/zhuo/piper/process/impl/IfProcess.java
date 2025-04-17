@@ -38,6 +38,6 @@ public class IfProcess implements Process {
 
     @Override
     public ProcessType type() {
-        return null;
+        return ProcessType.IF;
     }
 }

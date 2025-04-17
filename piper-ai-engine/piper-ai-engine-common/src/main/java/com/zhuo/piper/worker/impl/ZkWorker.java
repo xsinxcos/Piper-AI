@@ -24,7 +24,7 @@ public class ZkWorker implements IWorker {
     @Resource
     private HandlerFactory handlerFactory;
         
-    @PostMapping("/start")
+    @PostMapping("/star")
     public Result<String> start(@RequestBody TopicMessage topicMessage) throws Exception {
         String msg = topicMessage.getMsg();
         Map<String, Object> map = JsonUtils.jsonToMap(msg);
