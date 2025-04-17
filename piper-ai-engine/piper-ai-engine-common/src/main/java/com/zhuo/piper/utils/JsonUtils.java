@@ -139,7 +139,8 @@ public class JsonUtils {
 
     /**
      * 基础映射方法（使用默认ObjectMapper）
-     * @param jsonNode 要转换的JSON节点
+     *
+     * @param jsonNode   要转换的JSON节点
      * @param targetType 目标类
      * @return 映射后的对象
      * @throws RuntimeException 包含具体的转换失败原因

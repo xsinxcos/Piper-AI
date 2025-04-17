@@ -40,7 +40,7 @@ public class ZkServiceFactory {
     public ServiceInstance<TopicMessage> register() throws Exception {
         ServiceInstanceBuilder<TopicMessage> builder = ServiceInstance.builder();
         // 构建服务实例信息
-         instance = builder
+        instance = builder
                 .name(config.getServiceName())  // 服务名称
                 .address(config.getIp())  // 实例IP
                 .port(Integer.parseInt(config.getPort()))// 实例端口
@@ -54,12 +54,12 @@ public class ZkServiceFactory {
     public List<ServiceInstance<TopicMessage>> getInstances() {
         try {
             return discovery.queryForInstances(config.getServiceName()).stream().toList();
-        }catch (Exception e){
-            throw new EngineException(" zk 获取所有实例失败：" ,e);
+        } catch (Exception e) {
+            throw new EngineException(" zk 获取所有实例失败：", e);
         }
     }
 
-    public ServiceInstance<TopicMessage> getInstance(){
+    public ServiceInstance<TopicMessage> getInstance() {
         List<ServiceInstance<TopicMessage>> instances = getInstances();
         return loadBalancer.select(instances, "piper-ai");
     }

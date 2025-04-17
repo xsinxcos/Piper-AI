@@ -25,7 +25,7 @@ public class TestController {
         SimpleTaskExecution execution = new SimpleTaskExecution();
         dagService.load("1").ifPresent(item -> {
             try {
-                schedule.run(item ,execution);
+                schedule.run(item, execution);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

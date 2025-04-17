@@ -1,6 +1,6 @@
 package com.zhuo.piper.task;
 
-public enum TaskStatus{
+public enum TaskStatus {
     /**
      * The task is in the process of being created.
      */

@@ -1,6 +1,6 @@
 package com.zhuo.piper.task;
 
-public interface RollBackHandler{
+public interface RollBackHandler {
     /**
      * 执行回滚
      *

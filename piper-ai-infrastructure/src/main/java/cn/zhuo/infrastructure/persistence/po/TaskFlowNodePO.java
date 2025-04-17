@@ -9,22 +9,22 @@ import java.time.LocalDateTime;
  */
 @Data
 public class TaskFlowNodePO {
-    
+
     /**
      * 关联ID
      */
     private String id;
-    
+
     /**
      * 工作流ID
      */
     private String flowId;
-    
+
     /**
      * 节点ID
      */
     private String nodeId;
-    
+
     /**
      * 创建时间
      */

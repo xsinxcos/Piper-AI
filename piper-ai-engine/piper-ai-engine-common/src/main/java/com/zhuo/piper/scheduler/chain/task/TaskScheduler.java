@@ -29,6 +29,6 @@ public class TaskScheduler extends AbstractSchedulerChain {
         Object output = eventDrive.schedule(new TopicMessage(Topic.START.getTopic(), trace, JsonUtils.toJson(map)));
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         task.setOutput(output);
-        handleNext(aTask , dag);
+        handleNext(aTask, dag);
     }
 }

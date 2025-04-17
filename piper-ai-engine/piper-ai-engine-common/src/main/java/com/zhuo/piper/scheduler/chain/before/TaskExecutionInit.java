@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class TaskExecutionInit  extends AbstractSchedulerChain {
+public class TaskExecutionInit extends AbstractSchedulerChain {
 
     @Override
     public void run(TaskExecution aTask, DAG dag) {
@@ -21,8 +21,8 @@ public class TaskExecutionInit  extends AbstractSchedulerChain {
         String getNodeId = zeroInDegreeNodes.get(0);
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         // 现在的 task 为 上一个节点的 task，需要初始化
-        if(aTask.getDagNodeId() != null){
-            task.set(aTask.getDagNodeId() ,aTask.getOutput());
+        if (aTask.getDagNodeId() != null) {
+            task.set(aTask.getDagNodeId(), aTask.getOutput());
         }
         task.setStartTime(new Date());
         task.setId(SnowflakeIdGenerator.getInstance().nextIdStr());
@@ -30,6 +30,6 @@ public class TaskExecutionInit  extends AbstractSchedulerChain {
         task.setInput(dag.getNode(getNodeId).getConfig());
         task.setStatus(TaskStatus.CREATING);
 
-        handleNext(task ,dag);
+        handleNext(task, dag);
     }
 }

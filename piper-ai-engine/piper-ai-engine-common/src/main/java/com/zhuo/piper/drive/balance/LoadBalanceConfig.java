@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class LoadBalanceConfig {
-    
+
     @Value("${load.balance.strategy:RoundRobin}")
     private String loadBalanceStrategy;
-    
+
     /**
      * 创建负载均衡器Bean
-     * 
+     *
      * @return 负载均衡器实例
      */
     @Bean

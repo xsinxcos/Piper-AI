@@ -13,11 +13,18 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TaskFlowNode {
-    
+
     private String id;
     private String flowId;
     private String nodeId;
     private LocalDateTime createdAt;
+
+    private TaskFlowNode(String id, String flowId, String nodeId, LocalDateTime createdAt) {
+        this.id = id;
+        this.flowId = flowId;
+        this.nodeId = nodeId;
+        this.createdAt = createdAt;
+    }
 
     /**
      * 创建工作流节点关联
@@ -29,12 +36,5 @@ public class TaskFlowNode {
         flowNode.nodeId = nodeId;
         flowNode.createdAt = LocalDateTime.now();
         return flowNode;
-    }
-
-    private TaskFlowNode(String id, String flowId, String nodeId, LocalDateTime createdAt) {
-        this.id = id;
-        this.flowId = flowId;
-        this.nodeId = nodeId;
-        this.createdAt = createdAt;
     }
 } 

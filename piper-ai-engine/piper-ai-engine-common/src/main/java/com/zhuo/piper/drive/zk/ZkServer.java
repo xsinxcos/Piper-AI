@@ -27,12 +27,12 @@
 //    ZkClient zkClient;
 //
 //
-////    @Resource
-////    SchedulerCenter schedulerCenter;
-////
-////    public ZkServer() {
-////        this.context = MapContext.getInstance();
-////    }
+/// /    @Resource
+/// /    SchedulerCenter schedulerCenter;
+/// /
+/// /    public ZkServer() {
+/// /        this.context = MapContext.getInstance();
+/// /    }
 //
 //
 //    @PostMapping("/trigger")

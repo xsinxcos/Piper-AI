@@ -21,16 +21,16 @@ public class IfProcess implements Process {
     @SneakyThrows
     @Override
     public Object run(TaskExecution aTask, DAG dag) {
-        String input = (String)aTask.getInput();
+        String input = (String) aTask.getInput();
         Map<String, Object> map = JsonUtils.jsonToMap(input);
-        String subDagId = JsonUtils.mapToObject(map , "subDagId" , String.class);
-        boolean condition = JsonUtils.mapToObject(map , "condition" , Boolean.class);
+        String subDagId = JsonUtils.mapToObject(map, "subDagId", String.class);
+        boolean condition = JsonUtils.mapToObject(map, "condition", Boolean.class);
         String id = aTask.getDagNodeId();
         // 逻辑判断是否满足条件
         // 子图展开
-        if(condition){
+        if (condition) {
             dagService.loadSubDag(subDagId).ifPresent(item -> {
-                dag.insertDAGAfterNode(id , item);
+                dag.insertDAGAfterNode(id, item);
             });
         }
         return null;

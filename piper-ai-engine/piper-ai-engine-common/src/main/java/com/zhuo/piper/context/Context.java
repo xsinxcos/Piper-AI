@@ -1,4 +1,4 @@
 package com.zhuo.piper.context;
 
-public interface Context extends Accessor{
+public interface Context extends Accessor {
 }

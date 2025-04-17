@@ -10,9 +10,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ZkClient implements RpcClient , DisposableBean {
+public class ZkClient implements RpcClient, DisposableBean {
+    private static String ip = "http://%s:%s";
     private ServiceInstance<TopicMessage> instance;
-
     @Resource
     private ZkServiceFactory zkServiceFactory;
 
@@ -20,8 +20,6 @@ public class ZkClient implements RpcClient , DisposableBean {
     void init() throws Exception {
         instance = zkServiceFactory.register();
     }
-
-    private static String ip = "http://%s:%s";
 
     @Override
     public Object trigger(TopicMessage param) {

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface DagEdgeMapper extends BaseMapper<DagEdge> {
-    
+
     @Select("SELECT * FROM dag_edge WHERE from_node_id IN (SELECT id FROM dag_node WHERE dag_id = #{dagId})")
     List<DagEdge> selectByDagId(String dagId);
 }

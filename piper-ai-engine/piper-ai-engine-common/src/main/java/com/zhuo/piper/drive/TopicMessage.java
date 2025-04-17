@@ -17,7 +17,7 @@ public class TopicMessage implements Serializable {
 
     private String msg;
 
-    public static <T> TopicMessage getInstance(Topic topic , String trace , T msg){
+    public static <T> TopicMessage getInstance(Topic topic, String trace, T msg) {
         TopicMessage topicMessage = new TopicMessage();
         topicMessage.topicName = topic.getTopic();
         topicMessage.trace = trace;

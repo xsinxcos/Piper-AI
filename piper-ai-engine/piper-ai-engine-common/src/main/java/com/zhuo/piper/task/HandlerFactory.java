@@ -26,7 +26,7 @@ public class HandlerFactory {
 
     /**
      * 根据类名获取Spring实例
-     * 
+     *
      * @param className 完整的类名
      * @return Spring实例，如果不存在则返回null
      */

@@ -8,8 +8,7 @@ import org.apache.curator.x.discovery.ServiceInstance;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ZkEventDrive implements EventDrive{
-
+public class ZkEventDrive implements EventDrive {
 
 
     @Resource

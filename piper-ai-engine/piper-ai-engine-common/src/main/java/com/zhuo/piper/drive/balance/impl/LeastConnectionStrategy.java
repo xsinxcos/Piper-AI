@@ -12,13 +12,13 @@ import java.util.Optional;
  * 选择当前活跃连接最少的节点
  */
 public class LeastConnectionStrategy implements LoadBalanceStrategy {
-    
+
     @Override
     public <T> T select(List<T> availableNodes, String key) {
         if (availableNodes == null || availableNodes.isEmpty()) {
             return null;
         }
-        
+
         // 如果节点实现了WorkerNode接口，根据当前连接数排序选择
         if (!availableNodes.isEmpty() && availableNodes.get(0) instanceof WorkerNode) {
             Optional<T> selected = availableNodes.stream()
@@ -27,14 +27,14 @@ public class LeastConnectionStrategy implements LoadBalanceStrategy {
                         WorkerNode node2 = (WorkerNode) o2;
                         return Integer.compare(node1.getActiveConnections(), node2.getActiveConnections());
                     });
-            
+
             return selected.orElse(availableNodes.get(0));
         }
-        
+
         // 如果节点没有实现WorkerNode接口，则退化为轮询策略
         return new RoundRobinStrategy().select(availableNodes, key);
     }
-    
+
     @Override
     public String getName() {
         return "LeastConnection";

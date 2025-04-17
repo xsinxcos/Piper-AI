@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TaskNodeFlow {
-    
+
     private String id;
     private String flowName;
     private String description;
@@ -27,8 +27,26 @@ public class TaskNodeFlow {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
-    
+
     private List<String> nodeIds = new ArrayList<>();
+
+    private TaskNodeFlow(String id, String flowName, String description, String flowType,
+                         Boolean enabled, Integer version,
+                         LocalDateTime createdAt, String createdBy,
+                         LocalDateTime updatedAt, String updatedBy,
+                         List<String> nodeIds) {
+        this.id = id;
+        this.flowName = flowName;
+        this.description = description;
+        this.flowType = flowType;
+        this.enabled = enabled;
+        this.version = version;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.nodeIds = nodeIds;
+    }
 
     /**
      * 创建新的任务节点工作流
@@ -49,24 +67,6 @@ public class TaskNodeFlow {
         return flow;
     }
 
-    private TaskNodeFlow(String id, String flowName, String description, String flowType, 
-                       Boolean enabled, Integer version,
-                       LocalDateTime createdAt, String createdBy,
-                       LocalDateTime updatedAt, String updatedBy,
-                       List<String> nodeIds) {
-        this.id = id;
-        this.flowName = flowName;
-        this.description = description;
-        this.flowType = flowType;
-        this.enabled = enabled;
-        this.version = version;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-        this.nodeIds = nodeIds;
-    }
-
     /**
      * 更新工作流基本信息
      */
@@ -78,7 +78,7 @@ public class TaskNodeFlow {
         this.updatedBy = updatedBy;
         this.version = this.version + 1;
     }
-    
+
     /**
      * 添加节点到工作流
      */
@@ -87,7 +87,7 @@ public class TaskNodeFlow {
             this.nodeIds.add(nodeId);
         }
     }
-    
+
     /**
      * 从工作流中移除节点
      */

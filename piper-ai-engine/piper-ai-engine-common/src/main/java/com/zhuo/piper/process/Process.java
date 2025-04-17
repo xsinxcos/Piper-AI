@@ -6,9 +6,9 @@ import com.zhuo.piper.struct.DAG;
 /**
  * 流程节点标识
  */
-public interface Process<O>{
+public interface Process<O> {
 
-    O run(TaskExecution aTask , DAG dag);
+    O run(TaskExecution aTask, DAG dag);
 
     ProcessType type();
 }

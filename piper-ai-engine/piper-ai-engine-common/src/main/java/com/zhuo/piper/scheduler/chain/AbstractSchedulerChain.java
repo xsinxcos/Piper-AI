@@ -1,8 +1,8 @@
 package com.zhuo.piper.scheduler.chain;
 
 import com.zhuo.piper.context.task.execution.TaskExecution;
-import com.zhuo.piper.struct.DAG;
 import com.zhuo.piper.scheduler.IScheduler;
+import com.zhuo.piper.struct.DAG;
 import lombok.Getter;
 import lombok.Setter;
 

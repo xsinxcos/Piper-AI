@@ -5,5 +5,5 @@ import com.zhuo.piper.struct.DAG;
 
 public interface IScheduler {
 
-    void run(TaskExecution aTask , DAG dag);
+    void run(TaskExecution aTask, DAG dag);
 }

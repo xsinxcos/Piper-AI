@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class RollBackTestHandler implements RollBackHandler , TaskHandler<String>, DescHandler {
+public class RollBackTestHandler implements RollBackHandler, TaskHandler<String>, DescHandler {
     @Override
     public String desc() {
         return "";
@@ -22,7 +22,7 @@ public class RollBackTestHandler implements RollBackHandler , TaskHandler<String
 
     @Override
     public String executeRollBack(String taskId, String params) {
-        log.info("我回滚了：{} {}", taskId ,params);
+        log.info("我回滚了：{} {}", taskId, params);
         return "";
     }
 

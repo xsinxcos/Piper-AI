@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Mapper
 public interface TaskFlowNodeDAO {
-    
+
     /**
      * 插入任务流程节点
      *
@@ -19,7 +19,7 @@ public interface TaskFlowNodeDAO {
      * @return 影响行数
      */
     int insert(TaskFlowNodePO po);
-    
+
     /**
      * 批量插入任务流程节点
      *
@@ -27,7 +27,7 @@ public interface TaskFlowNodeDAO {
      * @return 影响行数
      */
     int batchInsert(List<TaskFlowNodePO> poList);
-    
+
     /**
      * 更新任务流程节点
      *
@@ -35,7 +35,7 @@ public interface TaskFlowNodeDAO {
      * @return 影响行数
      */
     int update(TaskFlowNodePO po);
-    
+
     /**
      * 根据ID查询任务流程节点
      *
@@ -43,7 +43,7 @@ public interface TaskFlowNodeDAO {
      * @return 任务流程节点持久化对象
      */
     TaskFlowNodePO selectById(@Param("id") String id);
-    
+
     /**
      * 根据流程ID查询所有流程节点
      *
@@ -51,7 +51,7 @@ public interface TaskFlowNodeDAO {
      * @return 任务流程节点持久化对象列表
      */
     List<TaskFlowNodePO> selectByFlowId(@Param("flowId") String flowId);
-    
+
     /**
      * 删除任务流程节点
      *
@@ -59,7 +59,7 @@ public interface TaskFlowNodeDAO {
      * @return 影响行数
      */
     int deleteById(@Param("id") String id);
-    
+
     /**
      * 根据流程ID删除所有流程节点
      *

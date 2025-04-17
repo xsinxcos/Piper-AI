@@ -37,7 +37,7 @@ public class HttpClient {
     /**
      * 发送GET请求
      *
-     * @param path 请求路径
+     * @param path   请求路径
      * @param params 查询参数
      * @return 响应结果
      */
@@ -47,10 +47,10 @@ public class HttpClient {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            url,
-            HttpMethod.GET,
-            entity,
-            String.class
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class
         );
 
         return convertToJsonNode(response.getBody());
@@ -69,10 +69,10 @@ public class HttpClient {
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            url,
-            HttpMethod.POST,
-            entity,
-            String.class
+                url,
+                HttpMethod.POST,
+                entity,
+                String.class
         );
         return convertToJsonNode(response.getBody());
     }
@@ -90,10 +90,10 @@ public class HttpClient {
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            url,
-            HttpMethod.PUT,
-            entity,
-            String.class
+                url,
+                HttpMethod.PUT,
+                entity,
+                String.class
         );
 
         return convertToJsonNode(response.getBody());
@@ -111,10 +111,10 @@ public class HttpClient {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            url,
-            HttpMethod.DELETE,
-            entity,
-            String.class
+                url,
+                HttpMethod.DELETE,
+                entity,
+                String.class
         );
 
         return convertToJsonNode(response.getBody());
@@ -123,7 +123,7 @@ public class HttpClient {
     /**
      * 发送表单数据
      *
-     * @param path 请求路径
+     * @param path     请求路径
      * @param formData 表单数据
      * @return 响应结果
      */
@@ -138,10 +138,10 @@ public class HttpClient {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            url,
-            HttpMethod.POST,
-            entity,
-            String.class
+                url,
+                HttpMethod.POST,
+                entity,
+                String.class
         );
 
         return convertToJsonNode(response.getBody());
@@ -150,7 +150,7 @@ public class HttpClient {
     /**
      * 构建完整的URL
      *
-     * @param path 路径
+     * @param path   路径
      * @param params 参数
      * @return 完整URL
      */

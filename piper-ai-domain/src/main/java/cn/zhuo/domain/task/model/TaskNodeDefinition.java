@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE) // 用于JPA等框架
 public class TaskNodeDefinition {
-    
+
     private String id;
     private String name;
     private String description;
@@ -26,6 +26,23 @@ public class TaskNodeDefinition {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
+
+    private TaskNodeDefinition(String id, String name, String description, String nodeType,
+                               String dslContent, Boolean enabled, Integer version,
+                               LocalDateTime createdAt, String createdBy,
+                               LocalDateTime updatedAt, String updatedBy) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.nodeType = nodeType;
+        this.dslContent = dslContent;
+        this.enabled = enabled;
+        this.version = version;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+    }
 
     /**
      * 创建新的任务节点定义
@@ -45,14 +62,14 @@ public class TaskNodeDefinition {
         definition.updatedBy = createdBy;
         return definition;
     }
-    
+
     /**
      * 重构任务节点定义（从存储数据中恢复）
      */
-    public static TaskNodeDefinition reconstitute(String id, String name, String description, String nodeType, 
-                                              String dslContent, Boolean enabled, Integer version,
-                                              LocalDateTime createdAt, String createdBy,
-                                              LocalDateTime updatedAt, String updatedBy) {
+    public static TaskNodeDefinition reconstitute(String id, String name, String description, String nodeType,
+                                                  String dslContent, Boolean enabled, Integer version,
+                                                  LocalDateTime createdAt, String createdBy,
+                                                  LocalDateTime updatedAt, String updatedBy) {
         TaskNodeDefinition definition = new TaskNodeDefinition();
         definition.id = id;
         definition.name = name;
@@ -67,24 +84,7 @@ public class TaskNodeDefinition {
         definition.updatedBy = updatedBy;
         return definition;
     }
-    
-    private TaskNodeDefinition(String id, String name, String description, String nodeType, 
-                            String dslContent, Boolean enabled, Integer version,
-                            LocalDateTime createdAt, String createdBy,
-                            LocalDateTime updatedAt, String updatedBy) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.nodeType = nodeType;
-        this.dslContent = dslContent;
-        this.enabled = enabled;
-        this.version = version;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-    }
-    
+
     /**
      * 更新任务节点定义内容
      */

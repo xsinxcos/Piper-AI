@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TaskNodeConnection {
-    
+
     private String id;
     private String sourceNodeId;
     private String targetNodeId;
@@ -28,13 +28,32 @@ public class TaskNodeConnection {
     private LocalDateTime updatedAt;
     private String updatedBy;
 
+    private TaskNodeConnection(String id, String sourceNodeId, String targetNodeId,
+                               String connectionName, String connectionType,
+                               String conditionExpression, Integer priority, Boolean enabled,
+                               LocalDateTime createdAt, String createdBy,
+                               LocalDateTime updatedAt, String updatedBy) {
+        this.id = id;
+        this.sourceNodeId = sourceNodeId;
+        this.targetNodeId = targetNodeId;
+        this.connectionName = connectionName;
+        this.connectionType = connectionType;
+        this.conditionExpression = conditionExpression;
+        this.priority = priority;
+        this.enabled = enabled;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+    }
+
     /**
      * 创建新的节点连接定义
      */
-    public static TaskNodeConnection create(String sourceNodeId, String targetNodeId, 
-                                          String connectionName, String connectionType,
-                                          String conditionExpression, Integer priority, 
-                                          String createdBy) {
+    public static TaskNodeConnection create(String sourceNodeId, String targetNodeId,
+                                            String connectionName, String connectionType,
+                                            String conditionExpression, Integer priority,
+                                            String createdBy) {
         TaskNodeConnection connection = new TaskNodeConnection();
         connection.id = SnowflakeIdGenerator.getInstance().nextIdStr();
         connection.sourceNodeId = sourceNodeId;
@@ -51,30 +70,11 @@ public class TaskNodeConnection {
         return connection;
     }
 
-    private TaskNodeConnection(String id, String sourceNodeId, String targetNodeId, 
-                             String connectionName, String connectionType,
-                             String conditionExpression, Integer priority, Boolean enabled,
-                             LocalDateTime createdAt, String createdBy,
-                             LocalDateTime updatedAt, String updatedBy) {
-        this.id = id;
-        this.sourceNodeId = sourceNodeId;
-        this.targetNodeId = targetNodeId;
-        this.connectionName = connectionName;
-        this.connectionType = connectionType;
-        this.conditionExpression = conditionExpression;
-        this.priority = priority;
-        this.enabled = enabled;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-    }
-
     /**
      * 更新连接信息
      */
     public void updateConnection(String connectionName, String connectionType,
-                               String conditionExpression, Integer priority, String updatedBy) {
+                                 String conditionExpression, Integer priority, String updatedBy) {
         this.connectionName = connectionName;
         this.connectionType = connectionType;
         this.conditionExpression = conditionExpression;

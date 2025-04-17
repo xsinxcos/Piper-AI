@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TaskNodeParameter {
-    
+
     private String id;
     private String nodeId;
     private String paramName;
@@ -29,12 +29,32 @@ public class TaskNodeParameter {
     private LocalDateTime updatedAt;
     private String updatedBy;
 
+    private TaskNodeParameter(String id, String nodeId, String paramName, String paramKey,
+                              String paramType, String defaultValue, String description,
+                              Boolean required, Integer displayOrder,
+                              LocalDateTime createdAt, String createdBy,
+                              LocalDateTime updatedAt, String updatedBy) {
+        this.id = id;
+        this.nodeId = nodeId;
+        this.paramName = paramName;
+        this.paramKey = paramKey;
+        this.paramType = paramType;
+        this.defaultValue = defaultValue;
+        this.description = description;
+        this.required = required;
+        this.displayOrder = displayOrder;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+    }
+
     /**
      * 创建新的节点参数定义
      */
-    public static TaskNodeParameter create(String nodeId, String paramName, String paramKey, 
-                                         String paramType, String defaultValue, String description,
-                                         Boolean required, Integer displayOrder, String createdBy) {
+    public static TaskNodeParameter create(String nodeId, String paramName, String paramKey,
+                                           String paramType, String defaultValue, String description,
+                                           Boolean required, Integer displayOrder, String createdBy) {
         TaskNodeParameter parameter = new TaskNodeParameter();
         parameter.id = SnowflakeIdGenerator.getInstance().nextIdStr();
         parameter.nodeId = nodeId;
@@ -52,32 +72,12 @@ public class TaskNodeParameter {
         return parameter;
     }
 
-    private TaskNodeParameter(String id, String nodeId, String paramName, String paramKey, 
-                            String paramType, String defaultValue, String description, 
-                            Boolean required, Integer displayOrder,
-                            LocalDateTime createdAt, String createdBy,
-                            LocalDateTime updatedAt, String updatedBy) {
-        this.id = id;
-        this.nodeId = nodeId;
-        this.paramName = paramName;
-        this.paramKey = paramKey;
-        this.paramType = paramType;
-        this.defaultValue = defaultValue;
-        this.description = description;
-        this.required = required;
-        this.displayOrder = displayOrder;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-    }
-
     /**
      * 更新参数信息
      */
-    public void updateParameter(String paramName, String paramType, String defaultValue, 
-                              String description, Boolean required, Integer displayOrder, 
-                              String updatedBy) {
+    public void updateParameter(String paramName, String paramType, String defaultValue,
+                                String description, Boolean required, Integer displayOrder,
+                                String updatedBy) {
         this.paramName = paramName;
         this.paramType = paramType;
         this.defaultValue = defaultValue;

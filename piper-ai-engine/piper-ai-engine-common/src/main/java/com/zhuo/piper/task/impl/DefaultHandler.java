@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class DefaultHandler implements TaskHandler<String> , DescHandler {
+public class DefaultHandler implements TaskHandler<String>, DescHandler {
     @Override
     public String handle(TaskExecution aTask) {
         log.info("我执行了！！！！！！！！！！！！");

@@ -25,117 +25,26 @@ import java.util.Map;
 
 public class SimpleTaskExecution extends MapObject implements TaskExecution {
 
-    public SimpleTaskExecution () {
+    public SimpleTaskExecution() {
         this(Collections.emptyMap());
     }
 
-    private SimpleTaskExecution (TaskExecution aSource) {
+    private SimpleTaskExecution(TaskExecution aSource) {
         this(aSource.asMap());
     }
 
-    public SimpleTaskExecution (Map<String,Object> aSource) {
+    public SimpleTaskExecution(Map<String, Object> aSource) {
         super(aSource);
-    }
-
-    public void setId(String id){
-        set(DSL.ID, id);
-    }
-
-    public void setParentId(String parentId){
-        set(DSL.PARENT_ID, parentId);
-    }
-
-    public void setStatus(TaskStatus status){
-        set(DSL.STATUS, status);
-    }
-
-    public void setOutput(Object output){
-        set(DSL.OUTPUT, output);
-    }
-
-    public void setInput(Object input){
-        set(DSL.INPUT, input);
-    }
-
-    public void setCreateTime(Date createTime){
-        set(DSL.CREATE_TIME, createTime);
-    }
-
-    public void setStartTime(Date startTime){
-       set(DSL.START_TIME, startTime);
-    }
-
-    public void setEndTime(Date endTime){
-        set(DSL.END_TIME, endTime);
-    }
-
-    public void setExecutionTime(long executionTime){
-        set(DSL.EXECUTION_TIME, executionTime);
-    }
-
-    public void setDagNodeId(String dagNodeId){
-        set(DSL.DAG_NODE_ID, dagNodeId);
-    }
-
-    @Override
-    public String getId() {
-        return getString(DSL.ID);
-    }
-
-    @Override
-    public String getDagNodeId() {
-        return getString(DSL.DAG_NODE_ID);
-    }
-
-    @Override
-    public String getParentId() {
-        return getString(DSL.PARENT_ID);
-    }
-
-    @Override
-    public TaskStatus getStatus() {
-        return TaskStatus.valueOf(getString(DSL.STATUS));
-    }
-
-    @Override
-    public Object getOutput() {
-        return get(DSL.OUTPUT);
-    }
-
-    @Override
-    public Object getInput() {
-        return get(DSL.INPUT);
-    }
-
-    @Override
-    public Date getCreateTime() {
-        return getDate(DSL.CREATE_TIME);
-    }
-
-    @Override
-    public Date getStartTime() {
-        return getDate(DSL.START_TIME);
-    }
-
-    @Override
-    public Date getEndTime() {
-        return getDate(DSL.END_TIME);
-    }
-
-    @Override
-    public long getExecutionTime() {
-        return getLong(DSL.EXECUTION_TIME);
     }
 
     /**
      * Creates a mutation {@link SimpleTaskExecution} instance which
      * is a copy of a {@link TaskExecution}.
      *
-     * @param aSource
-     *          The {@link TaskExecution} instance to copy.
+     * @param aSource The {@link TaskExecution} instance to copy.
      * @return the new {@link SimpleTaskExecution}
      */
-    public static SimpleTaskExecution of (TaskExecution aSource) {
+    public static SimpleTaskExecution of(TaskExecution aSource) {
         return new SimpleTaskExecution(aSource);
     }
 
@@ -145,7 +54,7 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
      *
      * @return The new {@link SimpleTaskExecution}.
      */
-    public static SimpleTaskExecution of (String aKey, Object aValue) {
+    public static SimpleTaskExecution of(String aKey, Object aValue) {
         return new SimpleTaskExecution(Collections.singletonMap(aKey, aValue));
     }
 
@@ -155,7 +64,97 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
      *
      * @return The new {@link SimpleTaskExecution}.
      */
-    public static SimpleTaskExecution of (Map<String,Object> aSource) {
+    public static SimpleTaskExecution of(Map<String, Object> aSource) {
         return new SimpleTaskExecution(aSource);
+    }
+
+    @Override
+    public String getId() {
+        return getString(DSL.ID);
+    }
+
+    public void setId(String id) {
+        set(DSL.ID, id);
+    }
+
+    @Override
+    public String getDagNodeId() {
+        return getString(DSL.DAG_NODE_ID);
+    }
+
+    public void setDagNodeId(String dagNodeId) {
+        set(DSL.DAG_NODE_ID, dagNodeId);
+    }
+
+    @Override
+    public String getParentId() {
+        return getString(DSL.PARENT_ID);
+    }
+
+    public void setParentId(String parentId) {
+        set(DSL.PARENT_ID, parentId);
+    }
+
+    @Override
+    public TaskStatus getStatus() {
+        return TaskStatus.valueOf(getString(DSL.STATUS));
+    }
+
+    public void setStatus(TaskStatus status) {
+        set(DSL.STATUS, status);
+    }
+
+    @Override
+    public Object getOutput() {
+        return get(DSL.OUTPUT);
+    }
+
+    public void setOutput(Object output) {
+        set(DSL.OUTPUT, output);
+    }
+
+    @Override
+    public Object getInput() {
+        return get(DSL.INPUT);
+    }
+
+    public void setInput(Object input) {
+        set(DSL.INPUT, input);
+    }
+
+    @Override
+    public Date getCreateTime() {
+        return getDate(DSL.CREATE_TIME);
+    }
+
+    public void setCreateTime(Date createTime) {
+        set(DSL.CREATE_TIME, createTime);
+    }
+
+    @Override
+    public Date getStartTime() {
+        return getDate(DSL.START_TIME);
+    }
+
+    public void setStartTime(Date startTime) {
+        set(DSL.START_TIME, startTime);
+    }
+
+    @Override
+    public Date getEndTime() {
+        return getDate(DSL.END_TIME);
+    }
+
+    public void setEndTime(Date endTime) {
+        set(DSL.END_TIME, endTime);
+    }
+
+    @Override
+    public long getExecutionTime() {
+        return getLong(DSL.EXECUTION_TIME);
+    }
+
+    public void setExecutionTime(long executionTime) {
+        set(DSL.EXECUTION_TIME, executionTime);
     }
 }

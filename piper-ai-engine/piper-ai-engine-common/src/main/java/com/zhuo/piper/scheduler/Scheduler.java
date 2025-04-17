@@ -44,8 +44,8 @@ public class Scheduler {
 
         localMessageFirstScheduler.setNext(dynamicSchedule);
 
-        dynamicSchedule.addNext("0" ,taskScheduler);
-        dynamicSchedule.addNext("1" ,processScheduler);
+        dynamicSchedule.addNext("0", taskScheduler);
+        dynamicSchedule.addNext("1", processScheduler);
 
         processScheduler.setNext(localMessageSecondScheduler);
 
@@ -58,7 +58,7 @@ public class Scheduler {
         schedulerChain = assignScheduler;
     }
 
-    public void run(DAG dag , TaskExecution execution) {
-        schedulerChain.run(execution , dag);
+    public void run(DAG dag, TaskExecution execution) {
+        schedulerChain.run(execution, dag);
     }
 }

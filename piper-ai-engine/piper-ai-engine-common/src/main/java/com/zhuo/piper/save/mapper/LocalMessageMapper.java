@@ -13,7 +13,7 @@ public interface LocalMessageMapper extends BaseMapper<LocalMessage> {
     void updateStatusSuccess(String messageId);
 
     @Update("UPDATE local_message SET status = 2 WHERE messageId = #{messageId} AND failureReason = #{failureReason}")
-    void updateStatusFailed(String messageId ,String failureReason);
+    void updateStatusFailed(String messageId, String failureReason);
 
     @Select("SELECT * FROM local_message WHERE messageId = #{messageId}")
     LocalMessage selectByMessageId(String messageId);

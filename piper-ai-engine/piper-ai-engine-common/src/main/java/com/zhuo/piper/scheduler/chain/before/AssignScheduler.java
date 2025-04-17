@@ -39,7 +39,7 @@ public class AssignScheduler extends AbstractSchedulerChain {
             List<CompletableFuture<List<Object>>> futures = new ArrayList<>();
             // 异步
             DAG finalDag = dag;
-            SimpleTaskExecution finalATask = (SimpleTaskExecution)aTask;
+            SimpleTaskExecution finalATask = (SimpleTaskExecution) aTask;
             zeroInDegreeNodes.forEach(id -> {
                 CompletableFuture<List<Object>> future = CompletableFuture.supplyAsync(() -> {
                     List<Object> re = new ArrayList<>();
@@ -47,7 +47,7 @@ public class AssignScheduler extends AbstractSchedulerChain {
                     SimpleTaskExecution copyTaskExecution = deepCopyTaskExecution(finalATask);
                     // 将需要的节点进行 unLock
                     copy.getNode(id).unLock();
-                    handleNext(copyTaskExecution,copy);
+                    handleNext(copyTaskExecution, copy);
                     re.add(copy);
                     re.add(copyTaskExecution);
                     return re;
@@ -56,12 +56,12 @@ public class AssignScheduler extends AbstractSchedulerChain {
             });
             // 获取所有的结果
             List<DAG> dags = new ArrayList<>();
-            Map<String ,Object> taskExecutionsMap = new HashMap<>();
+            Map<String, Object> taskExecutionsMap = new HashMap<>();
             for (CompletableFuture<List<Object>> future : futures) {
                 List<Object> objects = future.get();
                 dags.add((DAG) objects.get(0));
                 TaskExecution execution = (SimpleTaskExecution) objects.get(1);
-                taskExecutionsMap.put(execution.getDagNodeId() ,execution.getOutput());
+                taskExecutionsMap.put(execution.getDagNodeId(), execution.getOutput());
             }
             // 计算出最新的 Dag
             dag = DagUtils.getIntersection(dags);

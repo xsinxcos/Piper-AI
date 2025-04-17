@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class DagService{
+public class DagService {
 
     @Resource
     private DagNodeMapper nodeMapper;
@@ -29,7 +29,24 @@ public class DagService{
     @Resource
     private DagEdgeMapper dagEdgeMapper;
 
-    public void save(DAG dag){
+    private static List<DagEdge> getDagEdges(DAG dag) {
+        Map<String, List<String>> edges = dag.getEdges();
+        List<DagEdge> saveEdges = new ArrayList<>();
+        edges.forEach((k, v) -> {
+            v.forEach(toNodeId -> {
+                DagEdge edge = DagEdge.builder()
+                        .id(SnowflakeIdGenerator.getInstance().nextIdStr())
+                        .fromNodeId(k)
+                        .toNodeId(toNodeId)
+                        .version(0L)
+                        .build();
+                saveEdges.add(edge);
+            });
+        });
+        return saveEdges;
+    }
+
+    public void save(DAG dag) {
         DagEntity dagEntity = DagEntity.builder()
                 .id(SnowflakeIdGenerator.getInstance().nextIdStr())
                 .version(0L)
@@ -44,27 +61,10 @@ public class DagService{
 
     }
 
-    private static List<DagEdge> getDagEdges(DAG dag) {
-        Map<String, List<String>> edges = dag.getEdges();
-        List<DagEdge> saveEdges = new ArrayList<>();
-        edges.forEach((k ,v) -> {
-            v.forEach(toNodeId -> {
-                DagEdge edge = DagEdge.builder()
-                        .id(SnowflakeIdGenerator.getInstance().nextIdStr())
-                        .fromNodeId(k)
-                        .toNodeId(toNodeId)
-                        .version(0L)
-                        .build();
-                saveEdges.add(edge);
-            });
-        });
-        return saveEdges;
-    }
-
     private List<DagNode> getDagNodes(DAG dag, DagEntity dagEntity) {
         Map<String, DAG.DagNode> nodes = dag.getNodes();
         List<DagNode> saveNodes = new ArrayList<>();
-        nodes.forEach((k ,v) -> {
+        nodes.forEach((k, v) -> {
             String config = JsonUtils.toJson(v);
             DagNode dagNode = DagNode.builder()
                     .id(k)
@@ -79,7 +79,7 @@ public class DagService{
         return saveNodes;
     }
 
-    public  Optional<DAG>  load(String dagId){
+    public Optional<DAG> load(String dagId) {
         // 获取最新的DAG实体
         DagEntity dagEntity = dagEntityMapper.selectLatest(dagId);
         if (dagEntity == null) {
@@ -88,7 +88,7 @@ public class DagService{
         return buildDAG(dagEntity.getId());
     }
 
-    public Optional<DAG> loadSubDag(String subDagId){
+    public Optional<DAG> loadSubDag(String subDagId) {
         // 获取最新的DAG实体
         DagEntity dagEntity = dagEntityMapper.selectById(subDagId);
         if (dagEntity == null) {
@@ -97,7 +97,7 @@ public class DagService{
         return buildDAG(dagEntity.getId());
     }
 
-    private Optional<DAG>  buildDAG(String dagId){
+    private Optional<DAG> buildDAG(String dagId) {
         // 加载所有节点
         List<DagNode> dagNodes = nodeMapper.selectByDagId(dagId);
         // 加载所有边

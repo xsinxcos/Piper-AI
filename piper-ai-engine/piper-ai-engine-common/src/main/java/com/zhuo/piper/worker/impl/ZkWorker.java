@@ -23,14 +23,14 @@ public class ZkWorker implements IWorker {
 
     @Resource
     private HandlerFactory handlerFactory;
-        
+
     @PostMapping("/star")
     public Result<String> start(@RequestBody TopicMessage topicMessage) throws Exception {
         String msg = topicMessage.getMsg();
         Map<String, Object> map = JsonUtils.jsonToMap(msg);
 
-        SimpleTaskExecution execution = JsonUtils.mapToObject(map ,"TaskExecution" , SimpleTaskExecution.class);
-        DAG dag = JsonUtils.mapToObject(map , "dag" , DAG.class);
+        SimpleTaskExecution execution = JsonUtils.mapToObject(map, "TaskExecution", SimpleTaskExecution.class);
+        DAG dag = JsonUtils.mapToObject(map, "dag", DAG.class);
         String className = dag.getNode(execution.getDagNodeId()).getClassName();
         return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
     }
@@ -41,7 +41,7 @@ public class ZkWorker implements IWorker {
     }
 
     @Override
-    public void run(TaskExecution aTask , Handler<?> handler) {
+    public void run(TaskExecution aTask, Handler<?> handler) {
         try {
             handler.handle(aTask);
         } catch (Exception e) {

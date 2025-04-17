@@ -13,7 +13,7 @@ public class LocalMessageService {
     @Resource
     private LocalMessageMapper localMessageMapper;
 
-    public void firstConfirm(String messageId ,String messageBody ,String messageType) {
+    public void firstConfirm(String messageId, String messageBody, String messageType) {
         LocalMessage localMessage = LocalMessage.builder()
                 .id(SnowflakeIdGenerator.getInstance().nextIdStr())
                 .messageId(messageId)
@@ -31,13 +31,13 @@ public class LocalMessageService {
         localMessageMapper.updateStatusSuccess(messageId);
     }
 
-    public void failedConfirm(String messageId ,String failReason) {
-        localMessageMapper.updateStatusFailed(messageId ,failReason);
+    public void failedConfirm(String messageId, String failReason) {
+        localMessageMapper.updateStatusFailed(messageId, failReason);
     }
 
     public void tryConfirm(String messageId) {
         LocalMessage localMessage = localMessageMapper.selectByMessageId(messageId);
-        localMessage.setRetryCount(localMessage.getRetryCount()+1);
+        localMessage.setRetryCount(localMessage.getRetryCount() + 1);
         localMessageMapper.updateById(localMessage);
     }
 }

@@ -15,8 +15,8 @@ public class CheckEndScheduler extends AbstractSchedulerChain {
         // 将本次执行的节点移除
         dag.safeRemoveNode(aTask.getDagNodeId());
         List<String> zeroInDegreeNodeIds = dag.getZeroInDegreeAndNoLockNodes();
-        if(!zeroInDegreeNodeIds.isEmpty()){
-            handleNext(aTask , dag);
+        if (!zeroInDegreeNodeIds.isEmpty()) {
+            handleNext(aTask, dag);
         }
     }
 }
