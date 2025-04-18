@@ -1,0 +1,55 @@
+package com.zhuo.piper.core.worker.impl;
+
+import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
+import com.zhuo.piper.core.context.task.execution.TaskExecution;
+import com.zhuo.piper.core.drive.TopicMessage;
+import com.zhuo.piper.core.task.Handler;
+import com.zhuo.piper.core.task.HandlerFactory;
+import com.zhuo.piper.core.worker.IWorker;
+import com.zhuo.piper.model.aggregates.DAG;
+import com.zhuo.piper.type.http.Result;
+import com.zhuo.piper.utils.JsonUtils;
+import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping
+public class ZkWorker implements IWorker {
+
+    @Resource
+    private HandlerFactory handlerFactory;
+
+    @PostMapping("/start")
+    public Result<String> start(@RequestBody TopicMessage topicMessage) throws Exception {
+        String msg = topicMessage.getMsg();
+        try {
+            Map<String, Object> map = JsonUtils.jsonToMap(msg);
+            SimpleTaskExecution execution = JsonUtils.mapToObject(map, "TaskExecution", SimpleTaskExecution.class);
+            DAG dag = JsonUtils.mapToObject(map, "dag", DAG.class);
+            String className = dag.getNode(execution.getDagNodeId()).getClassName();
+            return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process message: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void run(TaskExecution aTask, Handler<?> handler) {
+        try {
+            handler.handle(aTask);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
