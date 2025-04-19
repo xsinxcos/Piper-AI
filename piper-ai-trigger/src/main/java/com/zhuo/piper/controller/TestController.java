@@ -36,6 +36,6 @@ public class TestController {
             }
         });
         HashMap<String, Object> output = (HashMap<String, Object>) execution.getOutput();
-        return output.get("1").toString();
+        return output.get("4").toString();
     }
 }

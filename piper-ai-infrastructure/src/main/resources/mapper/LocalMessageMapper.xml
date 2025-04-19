@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuo.piper.persistence.dao.LocalMessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.zhuo.piper.persistence.po.LocalMessagePO">
+            <id property="id" column="id" />
+            <result property="messageId" column="message_id" />
+            <result property="messageBody" column="message_body" />
+            <result property="messageType" column="message_type" />
+            <result property="status" column="status" />
+            <result property="retryCount" column="retry_count" />
+            <result property="maxRetryCount" column="max_retry_count" />
+            <result property="errorMessage" column="error_message" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,message_id,message_body,message_type,status,retry_count,
+        max_retry_count,error_message,create_time,update_time
+    </sql>
+</mapper>

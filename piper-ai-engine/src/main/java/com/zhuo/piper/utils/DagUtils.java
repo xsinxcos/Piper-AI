@@ -199,7 +199,13 @@ public class DagUtils {
         }
 
         // 保存目标节点原来的后续节点
-        List<String> originalNextNodes = dag.getEdges().getOrDefault(targetNodeId, new ArrayList<>());
+        List<String> originalNextNodes = new ArrayList<>(dag.getEdges().get(targetNodeId));
+
+        // 移除目标节点与原有后续节点之间的依赖关系
+        for (String nextNode : originalNextNodes) {
+            dag.getEdges().get(targetNodeId).remove(nextNode);
+            dag.getInDegrees().put(nextNode, dag.getInDegrees().get(nextNode) - 1);
+        }
 
         // 获取要插入的DAG的所有节点和边
         Map<String, DAG.DagNode> otherNodes = otherDAG.getNodes();
@@ -221,17 +227,17 @@ public class DagUtils {
         // 获取要插入的DAG的入度为0的节点（起始节点）
         List<String> startNodes = getZeroInDegreeAndNoLockNodes(otherDAG);
 
-        // 将目标节点连接到新DAG的所有起始节点
-        for (String startNode : startNodes) {
-            dag.addEdge(targetNodeId, startNode);
-        }
-
         // 找出子DAG的结束节点（出度为0的节点）
         List<String> endNodes = new ArrayList<>();
         for (String nodeId : otherNodes.keySet()) {
             if (!otherEdges.containsKey(nodeId) || otherEdges.get(nodeId).isEmpty()) {
                 endNodes.add(nodeId);
             }
+        }
+
+        // 将目标节点连接到新DAG的所有起始节点
+        for (String startNode : startNodes) {
+            dag.addEdge(targetNodeId, startNode);
         }
 
         // 将子DAG的结束节点连接到目标节点原来的后续节点
@@ -268,6 +274,11 @@ public class DagUtils {
                 dag.getNodes().remove(nodeId);
                 dag.getInDegrees().remove(nodeId);
                 dag.getEdges().remove(nodeId);
+            }
+
+            // 恢复目标节点与原有后续节点之间的依赖关系
+            for (String nextNode : originalNextNodes) {
+                dag.addEdge(targetNodeId, nextNode);
             }
 
             throw new IllegalStateException("插入DAG后形成了环，操作已回退");
