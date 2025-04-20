@@ -1,8 +1,8 @@
 package com.zhuo.piper.service.registry.zookeeper;
 
+import com.zhuo.piper.core.drive.zk.IZkServiceFactory;
 import com.zhuo.piper.service.registry.balance.LoadBalancer;
 import com.zhuo.piper.service.registry.zookeeper.exception.ZooKeeperException;
-import com.zhuo.piper.core.drive.zk.IZkServiceFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.apache.curator.framework.CuratorFramework;
@@ -10,11 +10,10 @@ import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceInstanceBuilder;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+//@Component
 public class ZkServiceFactory implements IZkServiceFactory{
     @Resource
     private CuratorFramework client;

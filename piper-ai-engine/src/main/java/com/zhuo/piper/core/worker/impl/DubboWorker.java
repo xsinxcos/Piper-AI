@@ -3,30 +3,26 @@ package com.zhuo.piper.core.worker.impl;
 import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
+import com.zhuo.piper.core.drive.RpcClient;
 import com.zhuo.piper.core.drive.TopicMessage;
 import com.zhuo.piper.core.task.Handler;
 import com.zhuo.piper.core.task.HandlerFactory;
-import com.zhuo.piper.core.worker.IWorker;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.type.http.Result;
 import com.zhuo.piper.utils.JsonUtils;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.Map;
 
-@RestController
-@RequestMapping
-public class ZkWorker implements IWorker {
+@DubboService
+public class DubboWorker implements RpcClient {
 
     @Resource
     private HandlerFactory handlerFactory;
 
-    @PostMapping("/start")
-    public Result<String> start(@RequestBody TopicMessage topicMessage) {
+    @Override
+    public Result<String> processMessage(TopicMessage topicMessage) {
         String msg = topicMessage.getMsg();
         try {
             Map<String, Object> map = JsonUtils.jsonToMap(msg);
@@ -39,12 +35,7 @@ public class ZkWorker implements IWorker {
         }
     }
 
-    @Override
-    public void init() {
 
-    }
-
-    @Override
     public void run(TaskExecution aTask, Handler<?> handler) {
         try {
             handler.handle(aTask);
@@ -52,5 +43,4 @@ public class ZkWorker implements IWorker {
             throw new RuntimeException(e);
         }
     }
-
-}
+} 

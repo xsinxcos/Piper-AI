@@ -3,18 +3,29 @@ package com.zhuo.piper.core.drive.zk;
 import com.zhuo.piper.core.drive.EventDrive;
 import com.zhuo.piper.core.drive.RpcClient;
 import com.zhuo.piper.core.drive.TopicMessage;
-import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ZkEventDrive implements EventDrive {
 
-    @Resource
-    private RpcClient rpcClient;
 
+    @DubboReference
+    private RpcClient dubboClient;
 
     @Override
     public Object schedule(TopicMessage topicMessage) {
-        return rpcClient.trigger(topicMessage);
+        int retryTimes = 3;
+        while (retryTimes > 0) {
+            try {
+                return dubboClient.processMessage(topicMessage).getData();
+            } catch (Exception e) {
+                retryTimes--;
+                if (retryTimes == 0) {
+                    throw new RuntimeException("Failed to process message after retries", e);
+                }
+            }
+        }
+        return null;
     }
 }

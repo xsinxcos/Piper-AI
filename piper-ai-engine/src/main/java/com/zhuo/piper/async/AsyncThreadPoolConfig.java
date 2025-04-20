@@ -1,5 +1,6 @@
 package com.zhuo.piper.async;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@Slf4j
 public class AsyncThreadPoolConfig {
     /**
      * CPU 核数
@@ -27,8 +29,22 @@ public class AsyncThreadPoolConfig {
      */
     private static final int QUEUE_SIZE = 10000;
 
-    @Bean("AsyncExecutor")
+    @Bean("AsyncExecutor1")
     public Executor asyncThreadPool() {
+        log.info("CPU_COUNT: {}", CPU_COUNT);
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
+                IO_MAX,
+                IO_MAX * 2,
+                KEEP_ALIVE_SECOND,
+                TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>(QUEUE_SIZE),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+        return poolExecutor;
+    }
+
+    @Bean("AsyncExecutor2")
+    public Executor asyncThreadPool2() {
         ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
                 Math.max(1, IO_MAX / 5),
                 IO_MAX,
