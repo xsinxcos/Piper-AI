@@ -1,5 +1,6 @@
 package com.zhuo.piper.core.worker.impl;
 
+import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.drive.TopicMessage;
@@ -29,8 +30,8 @@ public class ZkWorker implements IWorker {
         String msg = topicMessage.getMsg();
         try {
             Map<String, Object> map = JsonUtils.jsonToMap(msg);
-            SimpleTaskExecution execution = JsonUtils.mapToObject(map, "TaskExecution", SimpleTaskExecution.class);
-            DAG dag = JsonUtils.mapToObject(map, "dag", DAG.class);
+            SimpleTaskExecution execution = JsonUtils.mapToObject(map, DSL.TASK_EXECUTION, SimpleTaskExecution.class);
+            DAG dag = JsonUtils.mapToObject(map, DSL.DAG, DAG.class);
             String className = dag.getNode(execution.getDagNodeId()).getClassName();
             return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
         } catch (Exception e) {
