@@ -1,5 +1,6 @@
 package com.zhuo.piper.core.process.impl;
 
+import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.process.Process;
 import com.zhuo.piper.core.process.ProcessType;
@@ -23,8 +24,8 @@ public class IfProcess implements Process {
     public Object run(TaskExecution aTask, DAG dag) {
         String input = (String) aTask.getInput();
         Map<String, Object> map = JsonUtils.jsonToMap(input);
-        String subDagId = JsonUtils.mapToObject(map, "subDagId", String.class);
-        boolean condition = JsonUtils.mapToObject(map, "condition", Boolean.class);
+        String subDagId = JsonUtils.mapToObject(map, DSL.SUB_DAG_ID, String.class);
+        boolean condition = JsonUtils.mapToObject(map, DSL.CONDITION, Boolean.class);
         String id = aTask.getDagNodeId();
         // 逻辑判断是否满足条件
         // 子图展开

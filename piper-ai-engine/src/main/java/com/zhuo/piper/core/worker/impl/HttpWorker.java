@@ -2,9 +2,7 @@ package com.zhuo.piper.core.worker.impl;
 
 import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
-import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.drive.TopicMessage;
-import com.zhuo.piper.core.task.Handler;
 import com.zhuo.piper.core.task.HandlerFactory;
 import com.zhuo.piper.core.worker.IWorker;
 import com.zhuo.piper.model.aggregates.DAG;
@@ -20,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping
-public class ZkWorker implements IWorker {
+public class HttpWorker implements IWorker {
 
     @Resource
     private HandlerFactory handlerFactory;
@@ -39,18 +37,5 @@ public class ZkWorker implements IWorker {
         }
     }
 
-    @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void run(TaskExecution aTask, Handler<?> handler) {
-        try {
-            handler.handle(aTask);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }

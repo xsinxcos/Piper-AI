@@ -7,6 +7,7 @@ import com.zhuo.piper.core.drive.RpcClient;
 import com.zhuo.piper.core.drive.TopicMessage;
 import com.zhuo.piper.core.task.Handler;
 import com.zhuo.piper.core.task.HandlerFactory;
+import com.zhuo.piper.core.worker.IWorker;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.type.http.Result;
 import com.zhuo.piper.utils.JsonUtils;
@@ -16,7 +17,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import java.util.Map;
 
 @DubboService
-public class DubboWorker implements RpcClient {
+public class DubboWorker implements RpcClient , IWorker {
 
     @Resource
     private HandlerFactory handlerFactory;

@@ -70,4 +70,6 @@ public class DSL {
             INPUT
     };
 
+    public static final String SUB_DAG_ID = "subDagId";
+    public static final String CONDITION = "condition";
 }
