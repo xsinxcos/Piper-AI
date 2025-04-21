@@ -11,13 +11,26 @@ graph TD
     C --> D[工作节点]
     
     subgraph 调度引擎
-        B1[AssignScheduler] --> B2[TaskExecutionInit]
-        B2 --> B3[DynamicSchedule]
-        B3 --> B4[TaskScheduler]
-        B3 --> B5[ProcessScheduler]
-        B4 --> B6[CheckEndScheduler]
-        B5 --> B6
-        B6 --> B1
+        B1[AssignScheduler] -->|根据DAG分配任务| B2[TaskExecutionInit]
+        B2 -->|初始化任务执行上下文| B3[DynamicSchedule]
+        B3 -->|节点类型是Task| B4[TaskScheduler]
+        B3 -->|节点类型是Process| B5[ProcessScheduler]
+        B4 -->|使用EventDrive执行任务| B6[LocalMessageFirstScheduler]
+        B5 -->|使用Process接口执行流程| B7[RunSubProcessScheduler]
+        B6 -->|消息确认| B8[LocalMessageSecondScheduler]
+        B7 -->|递归处理子流程| B1
+        B8 -->|处理完成| B1
+    end
+    
+    subgraph DAG处理
+        E1[DAG图构建] --> E2[节点依赖分析]
+        E2 --> E3[零入度节点检测]
+        E3 --> E4[并行任务分配]
+    end
+    
+    subgraph 任务执行器
+        C1[EventDrive接口] --> C2[DubboEventDrive]
+        C1 --> C3[ZkEventDrive]
     end
     
     subgraph 工作节点
@@ -25,6 +38,8 @@ graph TD
         D2[Worker Node 2]
         D3[Worker Node N]
     end
+    
+    E4 --> B1
 ```
 
 ## 项目结构

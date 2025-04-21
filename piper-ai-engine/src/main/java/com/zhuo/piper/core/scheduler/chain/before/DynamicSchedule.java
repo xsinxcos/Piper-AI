@@ -25,9 +25,9 @@ public class DynamicSchedule extends AbstractSchedulerChain {
         String id = aTask.getDagNodeId();
         DAG.DagNode node = dag.getNode(id);
         if (node.getType() == 1) {
-            nextHandlers.get("1").run(aTask, dag);
+            nextHandlers.get("process").run(aTask, dag);
         } else if (node.getType() == 0) {
-            nextHandlers.get("0").run(aTask, dag);
+            nextHandlers.get("task").run(aTask, dag);
         }
         handleNext(aTask, dag);
     }

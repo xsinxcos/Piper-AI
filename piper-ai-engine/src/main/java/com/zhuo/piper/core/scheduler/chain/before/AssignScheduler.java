@@ -49,7 +49,7 @@ public class AssignScheduler extends AbstractSchedulerChain {
     @SneakyThrows
     @Override
     public void run(TaskExecution aTask, DAG dag) {
-        if (!dag.getZeroInDegreeAndNoLockNodes().isEmpty()) {
+        while (!dag.getZeroInDegreeAndNoLockNodes().isEmpty()) {
             // 获取没有 Lock 且 入度为 0 的节点
             List<String> zeroInDegreeNodes = dag.getZeroInDegreeAndNoLockNodes();
             // 入度为 0 的节点先进行 Lock 防止重复执行
@@ -91,6 +91,5 @@ public class AssignScheduler extends AbstractSchedulerChain {
             SimpleTaskExecution simpleTaskExecution = (SimpleTaskExecution) aTask;
             simpleTaskExecution.appendEnv(taskExecutionsMap);
         }
-        checkScheduler.run(aTask ,dag);
     }
 }
