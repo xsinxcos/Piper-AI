@@ -29,6 +29,8 @@ public class TaskScheduler extends AbstractSchedulerChain {
         Object output = eventDrive.schedule(TopicMessage.getInstance(Topic.START, trace, map));
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         task.setOutput(output);
+        // 任务执行完成后，移除 DAG 节点
+        dag.safeRemoveNode(aTask.getDagNodeId());
         handleNext(aTask, dag);
     }
 }

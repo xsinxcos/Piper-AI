@@ -7,6 +7,7 @@ import com.zhuo.piper.core.scheduler.chain.before.AssignScheduler;
 import com.zhuo.piper.core.scheduler.chain.before.DynamicSchedule;
 import com.zhuo.piper.core.scheduler.chain.before.TaskExecutionInit;
 import com.zhuo.piper.core.scheduler.chain.process.ProcessScheduler;
+import com.zhuo.piper.core.scheduler.chain.process.RunSubProcessScheduler;
 import com.zhuo.piper.core.scheduler.chain.task.LocalMessageFirstScheduler;
 import com.zhuo.piper.core.scheduler.chain.task.LocalMessageSecondScheduler;
 import com.zhuo.piper.core.scheduler.chain.task.TaskScheduler;
@@ -31,6 +32,8 @@ public class Scheduler {
     @Resource
     private CheckEndScheduler checkEndScheduler;
     @Resource
+    private RunSubProcessScheduler runSubProcessScheduler;
+    @Resource
     private LocalMessageFirstScheduler localMessageFirstScheduler;
     @Resource
     private LocalMessageSecondScheduler localMessageSecondScheduler;
@@ -39,6 +42,7 @@ public class Scheduler {
     void init() {
         // 在还没遍历完所有节点时，责任链成环
         assignScheduler.setNext(taskExecutionInit);
+        assignScheduler.addCheckScheduler(checkEndScheduler);
 
         taskExecutionInit.setNext(dynamicSchedule);
 
@@ -46,9 +50,9 @@ public class Scheduler {
         dynamicSchedule.addNext("0", taskScheduler);
         dynamicSchedule.addNext("1", processScheduler);
 
-        processScheduler.setNext(checkEndScheduler);
+        processScheduler.setNext(runSubProcessScheduler);
 
-        taskScheduler.setNext(checkEndScheduler);
+        runSubProcessScheduler.setNext(assignScheduler);
 
         checkEndScheduler.setNext(assignScheduler);
 

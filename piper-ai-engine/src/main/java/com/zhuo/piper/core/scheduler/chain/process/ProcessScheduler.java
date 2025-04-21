@@ -20,6 +20,8 @@ public class ProcessScheduler extends AbstractSchedulerChain {
         String className = dag.getNodes().get(id).getClassName();
         Process process = processFactory.getInstance(className);
         process.run(aTask, dag);
+        // 处理完后删除节点
+        dag.safeRemoveNode(id);
         handleNext(aTask, dag);
     }
 }

@@ -1,20 +1,14 @@
-package com.zhuo.piper.core.scheduler.chain.after;
+package com.zhuo.piper.core.scheduler.chain.process;
 
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
-public class CheckEndScheduler extends AbstractSchedulerChain {
-
+public class RunSubProcessScheduler extends AbstractSchedulerChain {
     @Override
     public void run(TaskExecution aTask, DAG dag) {
-        List<String> zeroInDegreeNodeIds = dag.getZeroInDegreeAndNoLockNodes();
-        if (!zeroInDegreeNodeIds.isEmpty()) {
-            handleNext(aTask, dag);
-        }
+        handleNext(aTask, dag);
     }
 }

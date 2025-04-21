@@ -19,15 +19,18 @@ import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.MapObject;
 import com.zhuo.piper.core.task.TaskStatus;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleTaskExecution extends MapObject implements TaskExecution {
+public class SimpleTaskExecution extends MapObject implements TaskExecution , Serializable {
 
     public SimpleTaskExecution() {
         this(Collections.emptyMap());
     }
+
 
     private SimpleTaskExecution(TaskExecution aSource) {
         this(aSource.asMap());
@@ -97,11 +100,20 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
 
     @Override
     public TaskStatus getStatus() {
-        return TaskStatus.valueOf(getString(DSL.STATUS));
+        String status = getString(DSL.STATUS);
+        if(status == null) {
+            return null;
+        }
+        return TaskStatus.valueOf(status);
     }
 
     public void setStatus(TaskStatus status) {
         set(DSL.STATUS, status);
+    }
+
+    @Override
+    public Object getEnv() {
+        return get(DSL.ENV);
     }
 
     @Override
@@ -111,6 +123,19 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
 
     public void setOutput(Object output) {
         set(DSL.OUTPUT, output);
+    }
+
+    public void setEnv(Object output) {
+        set(DSL.ENV, output);
+    }
+
+    public void appendEnv(Map<String, Object> env) {
+        Map<String, Object> currentEnv = (Map<String, Object>) get(DSL.ENV);
+        if (currentEnv == null) {
+            currentEnv = new HashMap<>();
+        }
+        currentEnv.putAll(env);
+        set(DSL.ENV, currentEnv);
     }
 
     @Override
@@ -150,8 +175,8 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution {
     }
 
     @Override
-    public long getExecutionTime() {
-        return getLong(DSL.EXECUTION_TIME);
+    public Date getExecutionTime() {
+        return getDate(DSL.EXECUTION_TIME);
     }
 
     public void setExecutionTime(long executionTime) {

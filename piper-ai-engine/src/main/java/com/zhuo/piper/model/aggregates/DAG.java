@@ -167,6 +167,7 @@ public class DAG implements Serializable {
         private String config;
         private String className;
         private Boolean isLock;
+        private Integer depth;
 
         public DagNode(String id, Integer type, String config, String className) {
             this.id = id;
@@ -174,6 +175,7 @@ public class DAG implements Serializable {
             this.config = config;
             this.className = className;
             this.isLock = false;
+            this.depth = 0;
         }
 
         public void lock() {

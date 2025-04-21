@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("hello")
@@ -35,7 +35,7 @@ public class TestController {
                 throw new RuntimeException(e);
             }
         });
-        HashMap<String, Object> output = (HashMap<String, Object>) execution.getOutput();
-        return output.get("4").toString();
+        Map object = (Map)((Map) execution.getEnv()).get("1");
+        return object.get("value").toString();
     }
 }

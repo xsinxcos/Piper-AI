@@ -193,6 +193,11 @@ public class JsonUtils {
         if (value == null) {
             return null;
         }
+        // 处理目标类型是 String 的情况
+        if (targetType == String.class) {
+            // 直接转换字符串或其他类型为字符串
+            return targetType.cast(value.toString());
+        }
         // 如果值是Map类型，需要特殊处理
         if (value instanceof Map) {
             return defaultMapper.convertValue(value, targetType);

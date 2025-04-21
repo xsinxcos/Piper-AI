@@ -11,5 +11,5 @@ public interface RpcClient {
      * @param message The topic message to process
      * @return Result containing the processing result
      */
-    Result<String> processMessage(TopicMessage message);
+    Result<Object> processMessage(TopicMessage message);
 } 

@@ -2,6 +2,7 @@ package com.zhuo.piper.core.process.impl;
 
 import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
+import com.zhuo.piper.core.parser.Parser;
 import com.zhuo.piper.core.process.Process;
 import com.zhuo.piper.core.process.ProcessType;
 import com.zhuo.piper.model.aggregates.DAG;
@@ -19,18 +20,24 @@ public class IfProcess implements Process {
 
     private final IDagService dagService;
 
+    private final Parser parser;
+
     @SneakyThrows
     @Override
     public Object run(TaskExecution aTask, DAG dag) {
         String input = (String) aTask.getInput();
         Map<String, Object> map = JsonUtils.jsonToMap(input);
         String subDagId = JsonUtils.mapToObject(map, DSL.SUB_DAG_ID, String.class);
-        boolean condition = JsonUtils.mapToObject(map, DSL.CONDITION, Boolean.class);
+        String condition = JsonUtils.mapToObject(map, DSL.CONDITION, String.class);
+        String right = JsonUtils.mapToObject(map, "right", String.class);
+        String parse = parser.parse(condition, aTask.getEnv());
         String id = aTask.getDagNodeId();
+        Integer depth = dag.getNode(id).getDepth();
         // 逻辑判断是否满足条件
         // 子图展开
-        if (condition) {
+        if (parse.equals(right)) {
             dagService.loadSubDag(subDagId).ifPresent(item -> {
+                item.getNodes().forEach((s, dagNode) -> dagNode.setDepth(depth + 1));
                 dag.insertDAGAfterNode(id, item);
             });
         }

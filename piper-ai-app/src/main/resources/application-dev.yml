@@ -32,6 +32,7 @@ logging:
     org.apache.zookeeper: WARN
     org.springframework: INFO
     org.apache.curator: WARN
+    com.alibaba.dubbo: WARN
 
 load:
   balance:

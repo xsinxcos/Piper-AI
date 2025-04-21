@@ -29,7 +29,7 @@ public class DSL {
     public static final String STATUS = "status";
 
 
-    public static final String OUTPUT = "output";
+    public static final String ENV = "env";
 
     public static final String ERROR = "error";
     public static final String INPUT = "input";
@@ -66,10 +66,12 @@ public class DSL {
             PRIORITY,
             CURRENT_TASK,
             PARENT_TASK_EXECUTION_ID,
-            OUTPUT,
+            ENV,
             INPUT
     };
 
     public static final String SUB_DAG_ID = "subDagId";
     public static final String CONDITION = "condition";
+    public static final String OUTPUT = "output";
+
 }

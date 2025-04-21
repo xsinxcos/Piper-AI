@@ -3,17 +3,18 @@ package com.zhuo.piper.core.task.impl;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.task.DescHandler;
 import com.zhuo.piper.core.task.TaskHandler;
-import com.zhuo.piper.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Slf4j
 @Component
-public class DefaultHandler implements TaskHandler<String>, DescHandler {
+public class DefaultHandler implements TaskHandler<Map>, DescHandler {
     @Override
-    public String handle(TaskExecution aTask) {
+    public Map handle(TaskExecution aTask) {
         log.info("我执行了！！！！！！！！！！！！");
-        return JsonUtils.toJson("我执行了！！！！！！！！！！！！");
+        return Map.of("value" ,true);
     }
 
     @Override

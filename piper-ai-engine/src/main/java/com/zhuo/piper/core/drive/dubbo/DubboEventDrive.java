@@ -1,13 +1,13 @@
-package com.zhuo.piper.core.drive.zk;
+package com.zhuo.piper.core.drive.dubbo;
 
 import com.zhuo.piper.core.drive.EventDrive;
 import com.zhuo.piper.core.drive.RpcClient;
 import com.zhuo.piper.core.drive.TopicMessage;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.stereotype.Component;
 
-//@Component
-public class ZkEventDrive implements EventDrive {
-
+@Component
+public class DubboEventDrive implements EventDrive {
     @DubboReference
     private RpcClient dubboClient;
 

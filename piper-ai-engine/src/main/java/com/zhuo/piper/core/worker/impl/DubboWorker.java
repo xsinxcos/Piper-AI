@@ -23,14 +23,14 @@ public class DubboWorker implements RpcClient , IWorker {
     private HandlerFactory handlerFactory;
 
     @Override
-    public Result<String> processMessage(TopicMessage topicMessage) {
+    public Result<Object> processMessage(TopicMessage topicMessage) {
         String msg = topicMessage.getMsg();
         try {
             Map<String, Object> map = JsonUtils.jsonToMap(msg);
             SimpleTaskExecution execution = JsonUtils.mapToObject(map, DSL.TASK_EXECUTION, SimpleTaskExecution.class);
             DAG dag = JsonUtils.mapToObject(map, DSL.DAG, DAG.class);
             String className = dag.getNode(execution.getDagNodeId()).getClassName();
-            return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
+            return Result.okResult(handlerFactory.getInstance(className).handle(execution));
         } catch (Exception e) {
             throw new RuntimeException("Failed to process message: " + e.getMessage(), e);
         }
