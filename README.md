@@ -2,44 +2,25 @@
 
 Piper-AI 是一个基于责任链模式的分布式流程调度系统，采用微服务架构设计，支持任务编排、动态调度和分布式执行。系统基于 Spring Boot 3.x 构建，使用 Dubbo 3.x 作为 RPC 框架，ZooKeeper 作为服务注册中心。
 
-## 系统架构
+## 调度架构
 
 ```mermaid
 graph TD
-    A[API层] --> B[调度引擎]
-    B --> C[任务执行器]
-    C --> D[工作节点]
-    
+  
     subgraph 调度引擎
         B1[AssignScheduler] -->|根据DAG分配任务| B2[TaskExecutionInit]
-        B2 -->|初始化任务执行上下文| B3[DynamicSchedule]
+        B2 --> B3[DynamicSchedule]
         B3 -->|节点类型是Task| B4[TaskScheduler]
         B3 -->|节点类型是Process| B5[ProcessScheduler]
-        B4 -->|使用EventDrive执行任务| B6[LocalMessageFirstScheduler]
-        B5 -->|使用Process接口执行流程| B7[RunSubProcessScheduler]
-        B6 -->|消息确认| B8[LocalMessageSecondScheduler]
+        B5 --> B7[RunSubProcessScheduler]
         B7 -->|递归处理子流程| B1
-        B8 -->|处理完成| B1
     end
-    
+  
     subgraph DAG处理
-        E1[DAG图构建] --> E2[节点依赖分析]
-        E2 --> E3[零入度节点检测]
-        E3 --> E4[并行任务分配]
+        E1[DAG图构建]
     end
-    
-    subgraph 任务执行器
-        C1[EventDrive接口] --> C2[DubboEventDrive]
-        C1 --> C3[ZkEventDrive]
-    end
-    
-    subgraph 工作节点
-        D1[Worker Node 1]
-        D2[Worker Node 2]
-        D3[Worker Node N]
-    end
-    
-    E4 --> B1
+  
+    E1 --> B1
 ```
 
 ## 项目结构
@@ -65,16 +46,17 @@ graph TD
 ## 核心特性
 
 1. 分布式任务调度
+
    - 基于责任链模式的任务调度流程
    - 支持动态任务分配和负载均衡
    - 分布式任务执行和状态管理
-
 2. 任务流程编排
+
    - 基于 DAG 的任务编排
    - 支持任务依赖关系管理
    - 支持动态任务调度
-
 3. 高可用设计
+
    - 服务注册与发现
    - 负载均衡
    - 故障转移
@@ -82,6 +64,7 @@ graph TD
 ## 快速开始
 
 ### 环境要求
+
 - JDK 17+
 - Maven 3.8+
 - Docker 20.10.0+
@@ -90,28 +73,34 @@ graph TD
 - ZooKeeper 3.8+
 
 ### 本地开发
+
 1. 克隆代码库
+
 ```bash
 git clone [your-repository-url]
 cd Piper-AI
 ```
 
 2. 安装依赖
+
 ```bash
 mvn clean install
 ```
 
 3. 启动服务
+
 ```bash
 mvn spring-boot:run
 ```
 
 ### Docker 部署
+
 详细部署说明请参考 [DEPLOY.md](DEPLOY.md)
 
 ## 配置说明
 
 ### 基础配置
+
 ```yaml
 spring:
   application:
@@ -140,16 +129,17 @@ dubbo:
 ## 开发指南
 
 1. 任务定义
+
    - 实现 Task 接口
    - 定义任务处理逻辑
    - 配置任务依赖关系
-
 2. 流程编排
+
    - 创建 DAG 图
    - 定义节点关系
    - 配置节点属性
-
 3. 任务执行
+
    - 提交任务流程
    - 监控执行状态
    - 处理执行结果
@@ -172,4 +162,4 @@ dubbo:
 
 ## 许可证
 
-MIT License 
+MIT License
