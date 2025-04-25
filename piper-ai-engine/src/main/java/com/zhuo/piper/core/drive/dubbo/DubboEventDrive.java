@@ -13,17 +13,6 @@ public class DubboEventDrive implements EventDrive {
 
     @Override
     public Object schedule(TopicMessage topicMessage) {
-        int retryTimes = 3;
-        while (retryTimes > 0) {
-            try {
-                return dubboClient.processMessage(topicMessage).getData();
-            } catch (Exception e) {
-                retryTimes--;
-                if (retryTimes == 0) {
-                    throw new RuntimeException("Failed to process message after retries", e);
-                }
-            }
-        }
-        return null;
+        return dubboClient.processMessage(topicMessage).getData();
     }
 }
