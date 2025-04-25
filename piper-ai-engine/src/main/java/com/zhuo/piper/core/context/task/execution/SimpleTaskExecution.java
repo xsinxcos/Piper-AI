@@ -80,9 +80,18 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution , Se
         set(DSL.ID, id);
     }
 
+    public void setJobId(String jobId){
+        set(DSL.JOB_ID, jobId);
+    }
+
     @Override
     public String getDagNodeId() {
         return getString(DSL.DAG_NODE_ID);
+    }
+
+    @Override
+    public String getJobId() {
+        return getString(DSL.JOB_ID);
     }
 
     public void setDagNodeId(String dagNodeId) {

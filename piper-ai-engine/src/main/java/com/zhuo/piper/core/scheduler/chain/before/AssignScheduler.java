@@ -2,7 +2,6 @@ package com.zhuo.piper.core.scheduler.chain.before;
 
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
-import com.zhuo.piper.core.scheduler.IScheduler;
 import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.utils.DagUtils;
@@ -30,8 +29,6 @@ public class AssignScheduler extends AbstractSchedulerChain {
     @Qualifier("AsyncExecutor2")
     private Executor asyncExecutor2;
 
-    private IScheduler checkScheduler;
-
     private Map<Integer, Executor> executorMap;
 
     @PostConstruct
@@ -41,14 +38,9 @@ public class AssignScheduler extends AbstractSchedulerChain {
         executorMap.put(1, asyncExecutor2);
     }
 
-    public void addCheckScheduler(IScheduler scheduler) {
-       checkScheduler = scheduler;
-    }
-
-
     @SneakyThrows
     @Override
-    public void run(TaskExecution aTask, DAG dag) {
+    public void run(TaskExecution aTask, DAG dag){
         while (!dag.getZeroInDegreeAndNoLockNodes().isEmpty()) {
             // 获取没有 Lock 且 入度为 0 的节点
             List<String> zeroInDegreeNodes = dag.getZeroInDegreeAndNoLockNodes();

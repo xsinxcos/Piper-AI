@@ -20,6 +20,7 @@ public interface TaskExecution extends Accessor, Serializable {
 
     String getDagNodeId();
 
+    String getJobId();
     /**
      * Get the id of the parent task, if this
      * is a sub-task.

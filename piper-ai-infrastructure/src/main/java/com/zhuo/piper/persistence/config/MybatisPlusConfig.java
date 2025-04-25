@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan("cn.zhuo.piper.persistence.dao")
+@MapperScan("com.zhuo.piper.persistence.dao")
 public class MybatisPlusConfig {
     
     @Bean

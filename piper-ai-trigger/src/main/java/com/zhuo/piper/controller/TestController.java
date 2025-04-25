@@ -3,6 +3,7 @@ package com.zhuo.piper.controller;
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.scheduler.Scheduler;
 import com.zhuo.piper.service.IDagService;
+import com.zhuo.piper.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +29,9 @@ public class TestController {
     @GetMapping("/test")
     public String test() {
         SimpleTaskExecution execution = new SimpleTaskExecution();
-        dagService.load("1").ifPresent(item -> {
+        dagService.load("4").ifPresent(item -> {
             try {
+                execution.setJobId(SnowflakeIdGenerator.getInstance().nextIdStr());
                 schedule.run(item, execution);
             } catch (Exception e) {
                 throw new RuntimeException(e);
