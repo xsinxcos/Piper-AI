@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface DagEntityMapper extends BaseMapper<DagEntityPO> {
 
-    @Select("SELECT * FROM dag WHERE id = #{id} ORDER BY version DESC LIMIT 1")
+    @Select("SELECT * FROM dag WHERE id = #{id} AND del_flag = 0 ORDER BY version DESC LIMIT 1")
     DagEntityPO selectLatest(String id);
 
-    @Select("SELECT * FROM dag WHERE id = #{id} ORDER BY version DESC LIMIT 1")
+    @Select("SELECT * FROM dag WHERE id = #{id} AND del_flag = 0 ORDER BY version DESC LIMIT 1")
     DagEntityPO selectById(String id);
 }

@@ -1,26 +1,17 @@
 package com.zhuo.piper.persistence.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("dag")
-public class DagEntityPO {
+public class DagEntityPO extends BasePO{
     private String id;
 
     private String parentId;
 
-    private Long version;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
 }

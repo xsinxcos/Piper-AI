@@ -37,7 +37,6 @@ public class DagService implements IDagService {
                         .id(SnowflakeIdGenerator.getInstance().nextIdStr())
                         .fromNodeId(k)
                         .toNodeId(toNodeId)
-                        .version(0L)
                         .build();
                 saveEdges.add(edge);
             });
@@ -48,7 +47,6 @@ public class DagService implements IDagService {
     public void save(DAG dag) {
         DagEntityPO dagEntity = DagEntityPO.builder()
                 .id(SnowflakeIdGenerator.getInstance().nextIdStr())
-                .version(0L)
                 .build();
         dagEntityMapper.insert(dagEntity);
 
@@ -71,7 +69,6 @@ public class DagService implements IDagService {
                     .type(v.getType())
                     .config(config)
                     .nodeClass(v.getClass().getName())
-                    .version(0L)
                     .build();
             saveNodes.add(dagNode);
         });

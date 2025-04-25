@@ -42,6 +42,10 @@ mybatis-plus:
   type-aliases-package: cn.zhuo.infrastructure.persistence.po
   configuration:
     map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-value: 1   # 表示已删除
+      logic-not-delete-value: 0 # 表示未删除
 
 dubbo:
   application:

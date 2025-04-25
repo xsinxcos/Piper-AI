@@ -1,19 +1,15 @@
 package com.zhuo.piper.persistence.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @TableName("local_message")
-public class LocalMessagePO {
+public class LocalMessagePO extends BasePO {
     private String id;
 
     private String messageId;
@@ -29,8 +25,4 @@ public class LocalMessagePO {
     private Integer maxRetryCount;
 
     private String errorMessage;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
 }

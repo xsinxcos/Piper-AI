@@ -9,12 +9,12 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface LocalMessageMapper extends BaseMapper<LocalMessagePO> {
 
-    @Update("UPDATE local_message SET status = 1 WHERE message_id = #{messageId}")
+    @Update("UPDATE local_message SET status = 1 WHERE message_id = #{messageId} AND del_flag = 0")
     void updateStatusSuccess(String messageId);
 
-    @Update("UPDATE local_message SET status = 2, error_message = #{failureReason} WHERE message_id = #{messageId}")
+    @Update("UPDATE local_message SET status = 2, error_message = #{failureReason} WHERE message_id = #{messageId} AND del_flag = 0")
     void updateStatusFailed(String messageId, String failureReason);
 
-    @Select("SELECT * FROM local_message WHERE message_id = #{messageId}")
+    @Select("SELECT * FROM local_message WHERE message_id = #{messageId} AND del_flag = 0")
     LocalMessagePO selectByMessageId(String messageId);
 }

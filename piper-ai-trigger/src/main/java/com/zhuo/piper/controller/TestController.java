@@ -29,7 +29,7 @@ public class TestController {
     @GetMapping("/test")
     public String test() {
         SimpleTaskExecution execution = new SimpleTaskExecution();
-        dagService.load("4").ifPresent(item -> {
+        dagService.load("1").ifPresent(item -> {
             try {
                 execution.setJobId(SnowflakeIdGenerator.getInstance().nextIdStr());
                 schedule.run(item, execution);

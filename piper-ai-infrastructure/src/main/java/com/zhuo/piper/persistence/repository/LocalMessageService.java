@@ -2,12 +2,10 @@ package com.zhuo.piper.persistence.repository;
 
 import com.zhuo.piper.persistence.dao.LocalMessageMapper;
 import com.zhuo.piper.persistence.po.LocalMessagePO;
-import com.zhuo.piper.utils.SnowflakeIdGenerator;
 import com.zhuo.piper.service.ILocalMessageService;
+import com.zhuo.piper.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class LocalMessageService implements ILocalMessageService {
@@ -22,8 +20,6 @@ public class LocalMessageService implements ILocalMessageService {
                 .maxRetryCount(3)
                 .messageBody(messageBody)
                 .messageType(messageType)
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
                 .build();
         localMessageMapper.insert(localMessagePO);
     }

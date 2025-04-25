@@ -6,14 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("dag_node")
-public class DagNodePO {
+public class DagNodePO extends BasePO {
     // id
     private String id;
 
@@ -27,10 +25,4 @@ public class DagNodePO {
     private Integer type;
 
     private String nodeClass;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
-
-    private Long version;
 }
