@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class LocalMessageFirstScheduler extends AbstractSchedulerChain {
+public class LocalMessageFirstHandler extends AbstractSchedulerChain {
     @Resource
     private ILocalMessageService localMessageService;
 

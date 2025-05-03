@@ -113,6 +113,8 @@ public class DagService implements IDagService {
         for (DagEdgePO dagEdge : dagEdges) {
             dag.addEdge(dagEdge.getFromNodeId(), dagEdge.getToNodeId());
         }
+
+        dag.setId(dagId);
         return Optional.of(dag);
     }
 }

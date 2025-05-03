@@ -6,6 +6,7 @@ import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.utils.DagUtils;
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +29,9 @@ public class AssignScheduler extends AbstractSchedulerChain {
     @Autowired
     @Qualifier("AsyncExecutor2")
     private Executor asyncExecutor2;
+
+    @Setter
+    private AbstractSchedulerChain endChain;
 
     private Map<Integer, Executor> executorMap;
 
@@ -82,6 +86,10 @@ public class AssignScheduler extends AbstractSchedulerChain {
             // 计算出最新的 TaskExecution,但是 aTask 还是需要使用原来的地址
             SimpleTaskExecution simpleTaskExecution = (SimpleTaskExecution) aTask;
             simpleTaskExecution.appendEnv(taskExecutionsMap);
+        }
+
+        if(endChain != null){
+            endChain.run(aTask ,dag);
         }
     }
 }

@@ -12,9 +12,7 @@ import lombok.*;
 public class JobPO extends BasePO {
     private String id;
 
-    private String DagId;
-
-    private String dagNodeId;
+    private String dagId;
 
     private Integer status;
 }

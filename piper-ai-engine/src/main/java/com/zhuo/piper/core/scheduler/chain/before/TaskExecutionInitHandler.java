@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class TaskExecutionInit extends AbstractSchedulerChain {
+public class TaskExecutionInitHandler extends AbstractSchedulerChain {
 
     @Override
     public void run(TaskExecution aTask, DAG dag) {

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import java.io.Serializable;
@@ -16,19 +15,18 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 有向无环图 (Directed Acyclic Graph)
  */
+@Getter
 @Slf4j
-@Component
 public class DAG implements Serializable {
+    @Setter
+    private String id;
     // 所有节点Map，Key为节点ID，Value为节点处理器
-    @Getter
     private final Map<String, DagNode> nodes = new ConcurrentHashMap<>();
 
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
-    @Getter
     private final Map<String, List<String>> edges = new ConcurrentHashMap<>();
 
     // 入度表，用于拓扑排序
-    @Getter
     private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
 
