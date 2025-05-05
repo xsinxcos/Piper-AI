@@ -1,9 +1,9 @@
 package com.zhuo.piper.core.scheduler;
 
+import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.core.scheduler.chain.after.JobSuccessHandler;
-import com.zhuo.piper.core.scheduler.chain.before.AssignScheduler;
 import com.zhuo.piper.core.scheduler.chain.before.DynamicSchedule;
 import com.zhuo.piper.core.scheduler.chain.before.JobStartHandler;
 import com.zhuo.piper.core.scheduler.chain.before.TaskExecutionInitHandler;
@@ -15,8 +15,11 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 @Component
-public class Scheduler {
+public class SchedulerTrigger implements Trigger , PropertyChangeListener {
     private AbstractSchedulerChain schedulerChain;
     @Resource
     private DynamicSchedule dynamicSchedule;
@@ -27,20 +30,20 @@ public class Scheduler {
     @Resource
     private TaskExecutionInitHandler taskExecutionInitHandler;
     @Resource
-    private AssignScheduler assignScheduler;
-    @Resource
     private RunSubProcessScheduler runSubProcessScheduler;
     @Resource
     private JobStartHandler jobStartHandler;
     @Resource
     private JobSuccessHandler jobSuccessHandler;
+    @Resource
+    DagBrain dagBrain;
+    @Resource
+    ContextStore contextStore;
 
     @PostConstruct
     void init() {
-        jobStartHandler.setNext(assignScheduler);
+        dagBrain.loadTrigger(this);
         // 在还没遍历完所有节点时，责任链成环
-        assignScheduler.setNext(taskExecutionInitHandler);
-        assignScheduler.setEndChain(jobSuccessHandler);
 
         taskExecutionInitHandler.setNext(dynamicSchedule);
 
@@ -49,13 +52,25 @@ public class Scheduler {
 
         processScheduler.setNext(runSubProcessScheduler);
 
-        runSubProcessScheduler.setNext(assignScheduler);
-
-        schedulerChain = jobStartHandler;
+        schedulerChain = taskExecutionInitHandler;
     }
 
+    @Override
+    public void run(TaskExecution execution ,DAG dag) {
+        schedulerChain.run(execution ,dag);
+    }
 
-    public void run(DAG dag, TaskExecution execution) {
-        schedulerChain.run(execution, dag);
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if("trigger".equals(evt.getPropertyName())){
+            TriggerContent content = (TriggerContent) evt.getNewValue();
+            SimpleTaskExecution simpleTaskExecution = new SimpleTaskExecution();
+            simpleTaskExecution.setDagNodeId(content.getDagNode().getId());
+            simpleTaskExecution.setJobId(content.getJobId());
+            simpleTaskExecution.appendEnv(contextStore.get(content.getJobId()));
+            schedulerChain.run(simpleTaskExecution ,content.getDag());
+            contextStore.merge(simpleTaskExecution.getOutput() ,simpleTaskExecution.getDagNodeId() ,simpleTaskExecution.getJobId());
+            dagBrain.finish(simpleTaskExecution.getJobId() ,simpleTaskExecution.getDagNodeId());
+        }
     }
 }

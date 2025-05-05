@@ -6,20 +6,21 @@ import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.drive.EventDrive;
 import com.zhuo.piper.core.drive.Topic;
 import com.zhuo.piper.core.drive.TopicMessage;
+import com.zhuo.piper.core.scheduler.DagBrain;
 import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class TaskScheduler extends AbstractSchedulerChain {
 
     private final EventDrive eventDrive;
 
-    public TaskScheduler(EventDrive eventDrive) {
-        this.eventDrive = eventDrive;
-    }
+    private final DagBrain dagBrain;
 
 
     @Override
@@ -29,8 +30,6 @@ public class TaskScheduler extends AbstractSchedulerChain {
         Object output = eventDrive.schedule(TopicMessage.getInstance(Topic.START, trace, map));
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         task.setOutput(output);
-        // 任务执行完成后，移除 DAG 节点
-        dag.safeRemoveNode(aTask.getDagNodeId());
         handleNext(aTask, dag);
     }
 }

@@ -1,7 +1,9 @@
 package com.zhuo.piper.model.aggregates;
 
-import com.zhuo.piper.utils.DagUtils;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.SerializationUtils;
 
@@ -12,13 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 有向无环图 (Directed Acyclic Graph)
  */
-@Data
+@Getter
 @Slf4j
-public class DAG implements Serializable {
+public class TDAG implements Serializable {
+    @Setter
     private String id;
-    private String parentId;
-    // 所有节点Map，Key为节点ID
-    private final Map<String, DAG.DagNode> nodes = new ConcurrentHashMap<>();
+    // 所有节点Map，Key为节点ID，Value为节点处理器
+    private final Map<String, DagNode> nodes = new ConcurrentHashMap<>();
 
     // 节点连接关系，Key为源节点ID，Value为目标节点ID列表
     private final Map<String, List<String>> edges = new ConcurrentHashMap<>();
@@ -27,7 +29,7 @@ public class DAG implements Serializable {
     private final Map<String, Integer> inDegrees = new ConcurrentHashMap<>();
 
 
-    public DAG.DagNode getNode(String nodeId) {
+    public DagNode getNode(String nodeId) {
         return nodes.get(nodeId);
     }
 
@@ -37,7 +39,7 @@ public class DAG implements Serializable {
      * @param nodeId 节点ID
      * @return 当前DAG实例
      */
-    public DAG addNode(String nodeId, DAG.DagNode node) {
+    public TDAG addNode(String nodeId, DagNode node) {
         nodes.put(nodeId, node);
         inDegrees.putIfAbsent(nodeId, 0);
         return this;
@@ -50,7 +52,7 @@ public class DAG implements Serializable {
      * @param toNodeId   目标节点ID
      * @return 当前DAG实例
      */
-    public DAG addEdge(String fromNodeId, String toNodeId) {
+    public TDAG addEdge(String fromNodeId, String toNodeId) {
         // 确保节点存在
         if (!nodes.containsKey(fromNodeId) || !nodes.containsKey(toNodeId)) {
             throw new IllegalArgumentException("节点不存在：" +
@@ -80,7 +82,7 @@ public class DAG implements Serializable {
      * @param dag DAG实例
      * @return 是否有环
      */
-    public static boolean hasCycle(DAG dag) {
+    public static boolean hasCycle(TDAG dag) {
         // 复制一份入度表进行拓扑排序
         Map<String, Integer> inDegreeCopy = new HashMap<>(dag.getInDegrees());
 
@@ -123,8 +125,8 @@ public class DAG implements Serializable {
      * @param nodeId 当前节点ID
      * @return 下一个Handler的Map（key为节点ID，value为Handler）
      */
-    public Map<String, DAG.DagNode> getNextHandler(String nodeId) {
-        Map<String, DAG.DagNode> nextHandlers = new HashMap<>();
+    public Map<String, DagNode> getNextHandler(String nodeId) {
+        Map<String, DagNode> nextHandlers = new HashMap<>();
 
         // 获取当前节点的所有后续节点
         List<String> nextNodeIds = edges.getOrDefault(nodeId, Collections.emptyList());
@@ -147,8 +149,8 @@ public class DAG implements Serializable {
     /**
      * 获取 入度为 0 的节点
      */
-    public List<DAG.DagNode> getZeroInDegreeNodes() {
-        return getZeroInDegreeNodes(this);
+    public List<DagNode> getZeroInDegreeAndNoLockNodes() {
+        return getZeroInDegreeAndNoLockNodes(this);
     }
 
     /**
@@ -168,7 +170,7 @@ public class DAG implements Serializable {
      * @return 当前DAG实例
      * @throws IllegalStateException 如果节点的入度不为0
      */
-    public DAG safeRemoveNode(String nodeId) {
+    public TDAG safeRemoveNode(String nodeId) {
         return safeRemoveNode(this, nodeId);
     }
 
@@ -181,7 +183,7 @@ public class DAG implements Serializable {
      * @return 当前DAG实例
      * @throws IllegalStateException 如果节点的入度不为0
      */
-    public static DAG safeRemoveNode(DAG dag, String nodeId) {
+    public static TDAG safeRemoveNode(TDAG dag, String nodeId) {
         // 检查节点是否存在
         if (!dag.getNodes().containsKey(nodeId)) {
             throw new IllegalArgumentException("节点不存在：" + nodeId);
@@ -223,11 +225,11 @@ public class DAG implements Serializable {
      * @throws IllegalArgumentException 如果目标节点不存在
      * @throws IllegalStateException    如果插入后形成环
      */
-    public DAG insertDAGAfterNode(String targetNodeId, DAG otherDAG) {
-        return DagUtils.insertDAGAfterNode(this ,targetNodeId, otherDAG);
+    public TDAG insertDAGAfterNode(String targetNodeId, DAG otherDAG) {
+        return insertDAGAfterNode(targetNodeId, otherDAG);
     }
 
-    public DAG deepCopy() {
+    public TDAG deepCopy() {
         // 通过序列化进行深拷贝
         try {
             return SerializationUtils.clone(this);
@@ -243,8 +245,8 @@ public class DAG implements Serializable {
      * @param dag DAG实例
      * @return 入度为0且未锁定的节点ID列表
      */
-    public List<DAG.DagNode> getZeroInDegreeNodes(DAG dag) {
-        List<DAG.DagNode> zeroInInDegreeNodes = new ArrayList<>();
+    public List<DagNode> getZeroInDegreeAndNoLockNodes(TDAG dag) {
+        List<DagNode> zeroInInDegreeNodes = new ArrayList<>();
         dag.getInDegrees().forEach((k, v) -> {
             if (v == 0) {
                 zeroInInDegreeNodes.add(nodes.get(k));

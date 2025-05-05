@@ -9,21 +9,17 @@ import com.zhuo.piper.utils.SnowflakeIdGenerator;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class TaskExecutionInitHandler extends AbstractSchedulerChain {
 
     @Override
     public void run(TaskExecution aTask, DAG dag) {
-        // 获取没有 Lock 且 入度为 0 的节点，一般情况下为唯一
-        List<String> zeroInDegreeNodes = dag.getZeroInDegreeAndNoLockNodes();
-        String getNodeId = zeroInDegreeNodes.get(0);
+        String getNodeId = aTask.getDagNodeId();
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         // 现在的 task 为 上一个节点的 task，需要初始化
         task.setStartTime(new Date());
         task.setId(SnowflakeIdGenerator.getInstance().nextIdStr());
-        task.setDagNodeId(getNodeId);
         task.setInput(dag.getNode(getNodeId).getConfig());
         task.setStatus(TaskStatus.CREATING);
 

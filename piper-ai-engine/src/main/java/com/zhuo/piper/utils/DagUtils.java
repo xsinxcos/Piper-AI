@@ -133,7 +133,7 @@ public class DagUtils {
     public static List<String> getZeroInDegreeAndNoLockNodes(DAG dag) {
         List<String> zeroInInDegreeNodes = new ArrayList<>();
         dag.getInDegrees().forEach((k, v) -> {
-            if (v == 0 && !dag.getNode(k).getIsLock()) {
+            if (v == 0) {
                 zeroInInDegreeNodes.add(k);
             }
         });
