@@ -6,21 +6,26 @@ Piper-AI 是一个基于责任链模式的分布式流程调度系统，采用�
 
 ```mermaid
 graph TD
-  
-    subgraph 调度引擎
-        B1[AssignScheduler] -->|根据DAG分配任务| B2[TaskExecutionInit]
-        B2 --> B3[DynamicSchedule]
-        B3 -->|节点类型是Task| B4[TaskScheduler]
-        B3 -->|节点类型是Process| B5[ProcessScheduler]
-        B5 --> B7[RunSubProcessScheduler]
-        B7 -->|递归处理子流程| B1
+    subgraph 核心调度层
+        A[SchedulerCore] --> B[DagBrain]
+        B --> C[DynamicScheduler]
     end
-  
-    subgraph DAG处理
-        E1[DAG图构建]
+
+    subgraph 执行链层
+        C -->|任务节点| D[TaskScheduler]
+        C -->|流程节点| E[ProcessScheduler]
+        E --> F[RunSubProcessScheduler]
     end
-  
-    E1 --> B1
+
+    subgraph 基础设施层
+        G[JobService] --> B
+        H[HttpClient] --> C
+    end
+
+    subgraph 支持组件
+        I[AsyncThreadPool] --> A
+    end
+
 ```
 
 ## 项目结构
