@@ -8,7 +8,7 @@ public class DSL {
 
     public static final String JOB_ID = "jobId";
 
-    public static final String DAG_NODE_ID = "dagNodeId";
+    public static final String DAG_NODE = "dagNode";
 
 
     public static final String RETRY_ATTEMPTS = "retryAttempts";
@@ -45,6 +45,8 @@ public class DSL {
     public static final String input = "input";
 
     public static final String DAG = "dag";
+
+    public static final String DAG_ID = "dag_id";
 
     public static final String TRACE = "trace";
 

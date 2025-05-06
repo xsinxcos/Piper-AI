@@ -1,4 +1,4 @@
-package com.zhuo.piper.core.scheduler.chain.task;
+package com.zhuo.piper.core.scheduler.execute.chain;
 
 import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
@@ -7,8 +7,7 @@ import com.zhuo.piper.core.drive.EventDrive;
 import com.zhuo.piper.core.drive.Topic;
 import com.zhuo.piper.core.drive.TopicMessage;
 import com.zhuo.piper.core.scheduler.DagBrain;
-import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
-import com.zhuo.piper.model.aggregates.DAG;
+import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +23,12 @@ public class TaskScheduler extends AbstractSchedulerChain {
 
 
     @Override
-    public void run(TaskExecution aTask, DAG dag) {
+    public void run(TaskExecution aTask) {
         String trace = aTask.getString(DSL.TRACE);
-        Map<String, Object> map = Map.of(DSL.TASK_EXECUTION, aTask, DSL.DAG, dag);
+        Map<String, Object> map = Map.of(DSL.TASK_EXECUTION, aTask);
         Object output = eventDrive.schedule(TopicMessage.getInstance(Topic.START, trace, map));
         SimpleTaskExecution task = (SimpleTaskExecution) aTask;
         task.setOutput(output);
-        handleNext(aTask, dag);
+        handleNext(aTask);
     }
 }

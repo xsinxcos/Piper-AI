@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class DAG implements Serializable {
     private String id;
+
     private String parentId;
     // 所有节点Map，Key为节点ID
     private final Map<String, DAG.DagNode> nodes = new ConcurrentHashMap<>();
@@ -255,8 +256,8 @@ public class DAG implements Serializable {
 
     @AllArgsConstructor
     @NoArgsConstructor
-    @Getter
-    @Setter
+    @Data
+    @ToString
     public static class DagNode implements Serializable {
         private String id;
         private String fromId;

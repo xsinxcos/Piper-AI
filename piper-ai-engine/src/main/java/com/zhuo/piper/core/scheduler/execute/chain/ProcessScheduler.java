@@ -1,10 +1,10 @@
-package com.zhuo.piper.core.scheduler.chain.process;
+package com.zhuo.piper.core.scheduler.execute.chain;
 
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.process.Process;
 import com.zhuo.piper.core.process.ProcessFactory;
 import com.zhuo.piper.core.scheduler.DagBrain;
-import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
+import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,11 @@ public class ProcessScheduler extends AbstractSchedulerChain {
     private DagBrain dagBrain;
 
     @Override
-    public void run(TaskExecution aTask, DAG dag) {
-        String id = aTask.getDagNodeId();
-        String className = dag.getNodes().get(id).getClassName();
+    public void run(TaskExecution aTask) {
+        DAG.DagNode node = (DAG.DagNode) aTask.getNode();
+        String className = node.getClassName();
         Process process = processFactory.getInstance(className);
-        process.run(aTask, dag);
-        handleNext(aTask, dag);
+        process.run(aTask);
+        handleNext(aTask);
     }
 }

@@ -24,14 +24,15 @@ public class IfProcess implements Process {
 
     @SneakyThrows
     @Override
-    public Object run(TaskExecution aTask, DAG dag) {
+    public Object run(TaskExecution aTask) {
         String input = (String) aTask.getInput();
         Map<String, Object> map = JsonUtils.jsonToMap(input);
         String subDagId = JsonUtils.mapToObject(map, DSL.SUB_DAG_ID, String.class);
         String condition = JsonUtils.mapToObject(map, DSL.CONDITION, String.class);
         String right = JsonUtils.mapToObject(map, "right", String.class);
         String parse = parser.parse(condition, aTask.getEnv());
-        String id = aTask.getDagNodeId();
+        DAG.DagNode node = (DAG.DagNode) aTask.getNode();
+        String id = node.getId();
         // 逻辑判断是否满足条件
         // 子图展开
         if (parse.equals(right)) {

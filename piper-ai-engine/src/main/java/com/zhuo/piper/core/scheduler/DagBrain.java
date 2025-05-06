@@ -1,5 +1,6 @@
 package com.zhuo.piper.core.scheduler;
 
+import com.zhuo.piper.core.scheduler.execute.TriggerContent;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.service.IDagService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class DagBrain {
     private final ConcurrentHashMap<String, Lock> jobIdDagLock = new ConcurrentHashMap<>();
 
     private final IDagService dagService;
+
     /**
      * 将 DAG 注册到 DagBrain
      *
@@ -91,6 +93,7 @@ public class DagBrain {
         dag.safeRemoveNode(nodeId);
         activity.get(jobId).remove(nodeId);
         checkAndAssign(jobId);
+        allFinishCheckAndTrigger(jobId ,dag);
         lock.unlock();
     }
 
@@ -105,7 +108,7 @@ public class DagBrain {
         Optional<DAG.DagNode> pull = select(jobId);
         while (pull.isPresent()) {
             DAG.DagNode dagNode = pull.get();
-            support.firePropertyChange("trigger", null, new TriggerContent(jobDagMap.get(jobId).deepCopy() ,dagNode ,jobId));
+            support.firePropertyChange(ListenTopic.TRIGGER, null, new TriggerContent(jobDagMap.get(jobId).deepCopy() ,dagNode ,jobId));
             pull = select(jobId);
         }
         lock.unlock();
@@ -119,5 +122,9 @@ public class DagBrain {
         support.addPropertyChangeListener(listener);
     }
 
-
+    private void allFinishCheckAndTrigger(String jobId ,DAG dag){
+        if(dag.getNodes().isEmpty()){
+            support.firePropertyChange(ListenTopic.ALL_FINISH ,null ,jobId);
+        }
+    }
 }

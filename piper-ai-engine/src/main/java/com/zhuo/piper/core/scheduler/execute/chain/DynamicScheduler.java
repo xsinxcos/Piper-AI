@@ -1,8 +1,8 @@
-package com.zhuo.piper.core.scheduler.chain.before;
+package com.zhuo.piper.core.scheduler.execute.chain;
 
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
-import com.zhuo.piper.core.scheduler.IScheduler;
-import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
+import com.zhuo.piper.core.scheduler.execute.IScheduler;
+import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class DynamicSchedule extends AbstractSchedulerChain {
+public class DynamicScheduler extends AbstractSchedulerChain {
 
     private final Map<String, IScheduler> nextHandlers = new HashMap<>();
 
@@ -21,14 +21,13 @@ public class DynamicSchedule extends AbstractSchedulerChain {
     }
 
     @Override
-    public void run(TaskExecution aTask, DAG dag){
-        String id = aTask.getDagNodeId();
-        DAG.DagNode node = dag.getNode(id);
+    public void run(TaskExecution aTask){
+        DAG.DagNode node = (DAG.DagNode) aTask.getNode();
         if (node.getType() == 1) {
-            nextHandlers.get("process").run(aTask, dag);
+            nextHandlers.get("process").run(aTask);
         } else if (node.getType() == 0) {
-            nextHandlers.get("task").run(aTask, dag);
+            nextHandlers.get("task").run(aTask);
         }
-        handleNext(aTask, dag);
+        handleNext(aTask);
     }
 }

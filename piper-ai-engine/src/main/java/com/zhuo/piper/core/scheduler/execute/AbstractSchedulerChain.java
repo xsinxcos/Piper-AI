@@ -1,9 +1,7 @@
-package com.zhuo.piper.core.scheduler.chain;
+package com.zhuo.piper.core.scheduler.execute;
 
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
-import com.zhuo.piper.core.scheduler.IScheduler;
 import com.zhuo.piper.exception.EngineException;
-import com.zhuo.piper.model.aggregates.DAG;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,10 +10,10 @@ import lombok.Setter;
 public abstract class AbstractSchedulerChain implements IScheduler {
     private IScheduler next;
 
-    protected void handleNext(TaskExecution aTask, DAG dag) {
+    protected void handleNext(TaskExecution aTask) {
         try {
             if (next != null) {
-                next.run(aTask, dag);
+                next.run(aTask);
             }
         } catch (Exception e) {
             throw new EngineException(e);
