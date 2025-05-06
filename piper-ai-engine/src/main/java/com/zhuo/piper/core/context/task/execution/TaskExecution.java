@@ -18,7 +18,7 @@ public interface TaskExecution extends Accessor, Serializable {
      */
     String getId();
 
-    String getDagNodeId();
+    Object getNode();
 
     String getJobId();
     /**

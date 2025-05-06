@@ -28,10 +28,8 @@ public class DubboWorker implements RpcClient , IWorker {
         try {
             Map<String, Object> map = JsonUtils.jsonToMap(msg);
             SimpleTaskExecution execution = JsonUtils.mapToObject(map, DSL.TASK_EXECUTION, SimpleTaskExecution.class);
-            DAG dag = JsonUtils.mapToObject(map, DSL.DAG, DAG.class);
-            assert dag != null;
             assert execution != null;
-            String className = dag.getNode(execution.getDagNodeId()).getClassName();
+            String className = ((DAG.DagNode)execution.getNode()).getClassName();
             return Result.okResult(handlerFactory.getInstance(className).handle(execution));
         } catch (Exception e) {
             throw new RuntimeException("Failed to process message: " + e.getMessage(), e);

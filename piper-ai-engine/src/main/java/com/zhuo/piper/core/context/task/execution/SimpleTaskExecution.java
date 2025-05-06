@@ -18,6 +18,8 @@ package com.zhuo.piper.core.context.task.execution;
 import com.zhuo.piper.core.context.DSL;
 import com.zhuo.piper.core.context.MapObject;
 import com.zhuo.piper.core.task.TaskStatus;
+import com.zhuo.piper.model.aggregates.DAG;
+import com.zhuo.piper.utils.JsonUtils;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -85,8 +87,8 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution , Se
     }
 
     @Override
-    public String getDagNodeId() {
-        return getString(DSL.DAG_NODE_ID);
+    public Object getNode() {
+        return JsonUtils.fromJsonNode(getString(DSL.DAG_NODE) , DAG.DagNode.class);
     }
 
     @Override
@@ -94,8 +96,8 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution , Se
         return getString(DSL.JOB_ID);
     }
 
-    public void setDagNodeId(String dagNodeId) {
-        set(DSL.DAG_NODE_ID, dagNodeId);
+    public void setNode(Object node) {
+        set(DSL.DAG_NODE, JsonUtils.toJson(node));
     }
 
     @Override
@@ -132,10 +134,6 @@ public class SimpleTaskExecution extends MapObject implements TaskExecution , Se
 
     public void setOutput(Object output) {
         set(DSL.OUTPUT, output);
-    }
-
-    public void setEnv(Object output) {
-        set(DSL.ENV, output);
     }
 
     public void appendEnv(Map<String, Object> env) {

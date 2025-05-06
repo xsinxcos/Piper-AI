@@ -29,8 +29,8 @@ public class HttpWorker implements IWorker {
         try {
             Map<String, Object> map = JsonUtils.jsonToMap(msg);
             SimpleTaskExecution execution = JsonUtils.mapToObject(map, DSL.TASK_EXECUTION, SimpleTaskExecution.class);
-            DAG dag = JsonUtils.mapToObject(map, DSL.DAG, DAG.class);
-            String className = dag.getNode(execution.getDagNodeId()).getClassName();
+            DAG.DagNode node = (DAG.DagNode) execution.getNode();
+            String className = node.getClassName();
             return Result.okResult((String) handlerFactory.getInstance(className).handle(execution));
         } catch (Exception e) {
             throw new RuntimeException("Failed to process message: " + e.getMessage(), e);

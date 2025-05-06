@@ -1,9 +1,8 @@
-package com.zhuo.piper.core.scheduler.chain.task;
+package com.zhuo.piper.core.scheduler.execute.chain;
 
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
-import com.zhuo.piper.core.scheduler.chain.AbstractSchedulerChain;
+import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import com.zhuo.piper.service.ILocalMessageService;
-import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +17,13 @@ public class LocalMessageFirstHandler extends AbstractSchedulerChain {
     private ILocalMessageService localMessageService;
 
     @Override
-    public void run(TaskExecution aTask, DAG dag) {
+    public void run(TaskExecution aTask) {
         // 写入消息表
-        String msgBody = JsonUtils.toJson(Map.of("TaskExecution", aTask, "DAG", dag));
+        String msgBody = JsonUtils.toJson(Map.of("TaskExecution", aTask));
         String messageType = "task";
         localMessageService.firstConfirm(aTask.getId(), msgBody, messageType);
         try {
-            handleNext(aTask, dag);
+            handleNext(aTask);
         } catch (Exception e) {
             log.error("执行失败：{}", e.getMessage());
             // 失败了，更新消息表
