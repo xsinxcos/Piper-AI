@@ -3,7 +3,6 @@ package com.zhuo.piper.core.scheduler.execute.chain;
 import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.process.Process;
 import com.zhuo.piper.core.process.ProcessFactory;
-import com.zhuo.piper.core.scheduler.DagBrain;
 import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import com.zhuo.piper.model.aggregates.DAG;
 import jakarta.annotation.Resource;
@@ -14,9 +13,6 @@ public class ProcessScheduler extends AbstractSchedulerChain {
 
     @Resource
     private ProcessFactory processFactory;
-
-    @Resource
-    private DagBrain dagBrain;
 
     @Override
     public void run(TaskExecution aTask) {

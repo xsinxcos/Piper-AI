@@ -22,9 +22,9 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '16'
         reservations:
-          cpus: '1'
+          cpus: '16'
 
 networks:
   piper-network:

@@ -3,6 +3,7 @@ package com.zhuo.piper.core.scheduler;
 import com.zhuo.piper.core.scheduler.execute.TriggerContent;
 import com.zhuo.piper.model.aggregates.DAG;
 import com.zhuo.piper.service.IDagService;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,6 +27,9 @@ public class DagBrain {
     private final ConcurrentHashMap<String, Lock> jobIdDagLock = new ConcurrentHashMap<>();
 
     private final IDagService dagService;
+
+    @Resource(name = "AsyncExecutor")
+    private Executor executor;
 
     /**
      * 将 DAG 注册到 DagBrain
@@ -108,7 +113,7 @@ public class DagBrain {
         Optional<DAG.DagNode> pull = select(jobId);
         while (pull.isPresent()) {
             DAG.DagNode dagNode = pull.get();
-            support.firePropertyChange(ListenTopic.TRIGGER, null, new TriggerContent(jobDagMap.get(jobId).deepCopy() ,dagNode ,jobId));
+            asyncFirePropertyChange(ListenTopic.TRIGGER, null, new TriggerContent(jobDagMap.get(jobId).deepCopy() ,dagNode ,jobId));
             pull = select(jobId);
         }
         lock.unlock();
@@ -124,7 +129,18 @@ public class DagBrain {
 
     private void allFinishCheckAndTrigger(String jobId ,DAG dag){
         if(dag.getNodes().isEmpty()){
-            support.firePropertyChange(ListenTopic.ALL_FINISH ,null ,jobId);
+            releaseResource(jobId);
+            asyncFirePropertyChange(ListenTopic.ALL_FINISH ,null ,jobId);
         }
+    }
+
+    private void asyncFirePropertyChange(String topic ,Object oldValue ,Object newValue){
+        executor.execute(() -> support.firePropertyChange(topic ,oldValue ,newValue));
+    }
+
+    private void releaseResource(String jobId){
+        jobDagMap.remove(jobId);
+        jobIdDagLock.remove(jobId);
+        activity.remove(jobId);
     }
 }

@@ -6,7 +6,6 @@ import com.zhuo.piper.core.context.task.execution.TaskExecution;
 import com.zhuo.piper.core.drive.EventDrive;
 import com.zhuo.piper.core.drive.Topic;
 import com.zhuo.piper.core.drive.TopicMessage;
-import com.zhuo.piper.core.scheduler.DagBrain;
 import com.zhuo.piper.core.scheduler.execute.AbstractSchedulerChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,8 +17,6 @@ import java.util.Map;
 public class TaskScheduler extends AbstractSchedulerChain {
 
     private final EventDrive eventDrive;
-
-    private final DagBrain dagBrain;
 
 
     @Override

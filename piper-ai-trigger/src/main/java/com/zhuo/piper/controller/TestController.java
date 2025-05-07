@@ -1,6 +1,5 @@
 package com.zhuo.piper.controller;
 
-import com.zhuo.piper.core.context.task.execution.SimpleTaskExecution;
 import com.zhuo.piper.core.scheduler.SchedulerCore;
 import com.zhuo.piper.service.IDagService;
 import jakarta.annotation.Resource;
@@ -21,8 +20,10 @@ public class TestController {
 
     @GetMapping("/test")
     public String test() {
-        SimpleTaskExecution execution = new SimpleTaskExecution();
+        long l = System.currentTimeMillis();
         schedulerCore.run("1");
+        long l1 = System.currentTimeMillis();
+        System.out.println("执行时间:" + (l1 - l));
         return null;
     }
 }

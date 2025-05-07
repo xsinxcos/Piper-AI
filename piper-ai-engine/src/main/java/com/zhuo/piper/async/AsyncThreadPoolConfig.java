@@ -29,25 +29,12 @@ public class AsyncThreadPoolConfig {
      */
     private static final int QUEUE_SIZE = 10000;
 
-    @Bean("AsyncExecutor1")
+    @Bean("AsyncExecutor")
     public Executor asyncThreadPool() {
         log.info("CPU_COUNT: {}", CPU_COUNT);
         ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
                 IO_MAX,
                 IO_MAX * 2,
-                KEEP_ALIVE_SECOND,
-                TimeUnit.SECONDS,
-                new LinkedBlockingDeque<>(QUEUE_SIZE),
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        return poolExecutor;
-    }
-
-    @Bean("AsyncExecutor2")
-    public Executor asyncThreadPool2() {
-        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
-                Math.max(1, IO_MAX / 5),
-                IO_MAX,
                 KEEP_ALIVE_SECOND,
                 TimeUnit.SECONDS,
                 new LinkedBlockingDeque<>(QUEUE_SIZE),
